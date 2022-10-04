@@ -6,56 +6,48 @@ class BresenhamCanvas(Canvas):
         self.create_line(x, y, x+1, y+1, fill=color, width=2)
 
     def draw_line(self, x0, y0, x1, y1, color="red"):
-        stepy = 0
-        stepx = 0
         dx = abs(x1-x0)
         dy = abs(y1-y0)
-        if dy < 0:
-            dy = -dy
-            stepy = -1
+        p = 2*dy-dx if dx > dy else 2*dx-dy
+        incE = 2*dy if dx > dy else 2*dx
+        incNE = 2*(dy-dx) if dx > dy else 2*(dx-dy)
+        if (x0 > x1) or (y0 > y1):
+            x, y = x1, y1
+            xend, yend = x0, y0
         else:
-            stepy = 1
-        if dx < 0:
-            dx = -dx
-            stepx = -1
+            x, y = x0, y0
+            xend, yend = x1, y1
+        if dx > dy :
+            start = x
+            end = xend 
         else:
-            stepx = 1
-        x = x0
-        y = y0
+            start = y
+            end = yend
+            
         self.draw_point(x, y, color=color)
-        if dx > dy:
-            p = 2 * dy - dx
-            incE = 2*dy
-            incNE = 2*(dy-dx)
-            while x != x1:
-                x = x + stepx
-                if p < 0:
-                    p = p + incE
+        for i in range(start,end):
+            if dx > dy:
+                x = x+1 if x < x1 else x-1
+            else:
+                y = y+1 if y < y1 else y-1
+            if p < 0:
+                p += incE
+            else:
+                if dx > dy:
+                    y = y+1 if y < y1 else y-1
                 else:
-                    y = y + stepy
-                    p = p + incNE
-                self.draw_point(x, y, color=color)
-        else:
-            p = 2 * dy - dx
-            incE = 2*dy
-            incNE = 2*(dy-dx)
-            while y != y1:
-                y = y + stepy
-                if p < 0:
-                    p = p + incE
-                else:
-                    x = x + stepx
-                    p = p + incNE
-                self.draw_point(x, y, color=color)
-
+                    x = x+1 if x < x1 else x-1
+                p += incNE
+        
+            self.draw_point(x, y, color=color)
 
 def drawsquare():
     canvas = BresenhamCanvas(window, width=500, height=700)
     canvas.pack(side=LEFT)
     canvas.draw_line(100, 100, 200, 100, color="blue")
-    canvas.draw_line(100, 100, 200, 200, color="blue")
+    canvas.draw_line(100, 100, 100, 200, color="blue")
     canvas.draw_line(200, 100, 200, 200, color="blue")
-    canvas.draw_line(200, 100, 200, 100, color="blue")
+    canvas.draw_line(100, 200, 200, 200, color="blue")
 
 
 def main():
