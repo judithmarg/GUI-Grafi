@@ -9,15 +9,19 @@ def bresenham(x0, y0, x1, y1):
     p = 2 * dy - dx
     incE = 2*dy
     incNE = 2*(dy-dx)
-    if x0 > x1:
-        x = x1
-        y = y1
-        xend = x0
+    if (x0 > x1) or (y0 > y1):
+        x, y = x1, y1
+        xend, yend = x0, y0
     else:
-        x = x0
-        y = y0
-        xend = x1
-    for i in range(x, xend):
+        x, y = x0, y0
+        xend, yend = x1, y1
+    if dx > dy:
+        start = x
+        end = xend
+    else:
+        start = y
+        end = yend
+    for i in range(start, end):
         blank[x, y] = (51, 222, 255)
         print('x =', x, 'y =', y)
         x = x+1 if x < x1 else x - 1

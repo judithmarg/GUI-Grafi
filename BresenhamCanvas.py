@@ -8,27 +8,38 @@ class BresenhamCanvas(Canvas):
     def draw_line(self, x0, y0, x1, y1, color="red"):
         dx = abs(x1-x0)
         dy = abs(y1-y0)
-        p = 2 * dy - dx
-        incE = 2*dy
-        incNE = 2*(dy-dx)
-        if x0 > x1:
-            x = x1
-            y = y1
-            xend = x0
+        p = 2*dy-dx if dx > dy else 2*dx-dy
+        incE = 2*dy if dx > dy else 2*dx
+        incNE = 2*(dy-dx) if dx > dy else 2*(dx-dy)
+        if (x0 > x1) and (y0 > y1):
+            x, y = x1, y1
+            xend, yend = x0, y0
         else:
-            x = x0
-            y = y0
-            xend = x1
-        for i in range(x, xend):
-            print('x =', x, 'y =', y)
-            x = x+1 if x < x1 else x - 1
+            x, y = x0, y0
+            xend, yend = x1, y1
+        if dx > dy:
+            start = x
+            end = xend
+        else:
+            start = y
+            end = yend
+
+        self.draw_point(x, y, color=color)
+        for i in range(start, end):
+            if dx > dy:
+                x = x+1 if x < x1 else x-1
+            else:
+                y = y+1 if y < y1 else y-1
             if p < 0:
                 p += incE
-                self.draw_point(x, y, color=color)
             else:
-                y = y+1 if y < y1 else y - 1
+                if dx > dy:
+                    y = y+1 if y < y1 else y-1
+                else:
+                    x = x+1 if x < x1 else x-1
                 p += incNE
-                self.draw_point(x, y, color=color)
+
+            self.draw_point(x, y, color=color)
 
 
 if __name__ == "__main__":
@@ -36,6 +47,7 @@ if __name__ == "__main__":
     root = Tk()
     canvas = BresenhamCanvas(root, width=CANVAS_SIZE, height=CANVAS_SIZE)
     canvas.pack()
-    canvas.draw_line(100, 100, 200, 100, color="blue")
-    canvas.draw_line(200, 100, 300, 350, color="blue")
+    #canvas.draw_line(100, 100, 200, 100, color="blue")
+    #canvas.draw_line(200, 100, 300, 350, color="blue")
+    canvas.draw_line(200, 100, 300, 30, color="blue")
     root.mainloop()
