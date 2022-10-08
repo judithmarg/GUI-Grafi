@@ -14,7 +14,7 @@ class BresenhamCanvas(Canvas):
         p = 2*dy-dx if dx > dy else 2*dx-dy
         incE = 2*dy if dx > dy else 2*dx
         incNE = 2*(dy-dx) if dx > dy else 2*(dx-dy)
-        if (x0 > x1) or (y0 > y1):
+        if (x0 > x1) and (y0 > y1):
             x, y = x1, y1
             xend, yend = x0, y0
         else:
@@ -41,10 +41,33 @@ class BresenhamCanvas(Canvas):
                 else:
                     x = x+1 if x < x1 else x-1
                 p += incNE
-
             self.draw_point(x, y, color=color)
-
-
+    
+    def draw_circunf(xc, yc, radio, color="red"):
+        x = 0
+        y = radio
+        p = 1 - radio
+        octanteSimetrico(xc,x,yc,y)
+        while (x < y):
+            x += 1
+            if p < 0:
+                p = p + 2*x +1
+            else:
+                y -= 1
+                p = p + 2*(x-y) + 1
+            octanteSimetrico(xc,x,yc,y) 
+        
+    
+    def octanteSimetrico(xc,x,yc,y, color):
+        self.draw_point(xc+x, yc+y, color =color)
+        self.draw_point(xc+x, yc-y, color =color)
+        self.draw_point(xc-x, yc+y, color =color)
+        self.draw_point(xc-x, yc-y, color =color)
+        self.draw_point(xc+y, yc+x, color =color)
+        self.draw_point(xc-y, yc+x, color =color)
+        self.draw_point(xc+y, yc-x, color =color)
+        self.draw_point(xc-y, yc-x, color =color)
+        
 def drawsquare():
     canvas.delete('all')
     canvas.draw_line(x0, y0, x1, y1, color="blue")
@@ -52,12 +75,15 @@ def drawsquare():
     # canvas.draw_line(x1, y0, x1, x1, color="blue")
     # canvas.draw_line(x1, y0, x1, y1, color="blue")
 
+def drawCircle():
+    canvas.delete('all')
+    canvas.draw_circunf(100,100,40,color="red")
 
 def draw_triangle():
     canvas.delete('all')
     canvas.draw_line(100, 100, 200, 100, color="blue")
-    canvas.draw_line(200, 100, 100, 200, color="blue")
-    canvas.draw_line(100, 200, 100, 100, color="blue")
+    canvas.draw_line(200, 100, 100, 200, color="red")
+    canvas.draw_line(100, 100, 100, 200, color="yellow")
 
 
 def setpoints():
@@ -81,6 +107,9 @@ def savefile():
                                         filetypes=(('PNG File', '.PNG'), ('PNG File', '.PNG')))
     file = file + ".PNG"
     ImageGrab.grab().crop((100, 100, 700, 700)).save(file)
+    canvas.draw_line(100, 100, 100, 200, color="blue")
+    canvas.draw_line(200, 100, 200, 200, color="blue")
+    canvas.draw_line(100, 200, 200, 200, color="blue")
 
 
 def main():
