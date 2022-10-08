@@ -131,35 +131,40 @@ class BresenhamCanvas(Canvas):
 
         
 def translation():
+    global xcenter, ycenter, radious
     canvas.delete('all')
+    coordinates_translation()
     if thereIsCircle:
         setpoints_circ()
-        print(xc)
-        print(yc)
-        array = canvas.translacion(xc,yc,40,40)
-        print(array)
-        canvas.draw_circunf(array[0],array[1],r-xc,color="red")
+        xcenter = xc
+        ycenter = yc
+        radious = r
+        array = canvas.translacion(xcenter,ycenter,coordx,coordy)
+        canvas.draw_circunf(array[0],array[1],radious-xcenter,color="red")
+        xcenter = array[0]
+        ycenter = array[1]
     elif thereIsRectangle:
         setpoints_square()
         print(x0)
         print(y0)
         print(x1)
         print(y1)
-        array2 = canvas.translacion(x0,y0,40,40)
-        array3 = canvas.translacion(x1,y1,40,40)
+        array2 = canvas.translacion(x0,y0,coordx,coordy)
+        array3 = canvas.translacion(x1,y1,coordx,coordy)
         canvas.draw_line(array2[0], array2[1], array3[0], array2[1], color="blue")
         canvas.draw_line(array2[0], array3[1], array3[0], array3[1], color="blue")
         canvas.draw_line(array3[0], array2[1], array3[0], array3[1], color="blue")
         canvas.draw_line(array2[0], array2[1], array2[0], array3[1], color="blue")
     elif thereIsTriangle:
         setpoints_triangle()
-        array0 = translacion(x0,y0,40,40)
-        array1 = translacion(x1,y1,40,40)
-        array2 = translacion(x2,y2,40,40)
+        array0 = translacion(x0,y0,coordx,coordy)
+        array1 = translacion(x1,y1,coordx,coordy)
+        array2 = translacion(x2,y2,coordx,coordy)
         canvas.draw_line(array0[0], array0[1], array1[0], array1[1], color="blue")
         canvas.draw_line(array1[0], array1[1], array2[0], array2[1], color="blue")
         canvas.draw_line(array0[0], array0[1], array2[0], array2[1], color="blue")
-        
+     
+       
 def drawCircle():
     global thereIsCircle
     thereIsCircle = True
@@ -169,7 +174,7 @@ def drawCircle():
     thereIsTriangle = False 
     setpoints_circ()
     canvas.draw_circunf(xc,yc,r-xc,color="red")
-
+    
 def drawsquare():
     global thereIsSquare
     thereIsSquare = True
@@ -216,7 +221,7 @@ def press_button_mouse(event):
     canvas.create_oval(event.x-5, event.y-5, event.x+5, event.y+5, fill="red")
 
 def setpoints_circ():
-    global xc, yc, r
+    global xc, yc, r, p
     xc = puntosx[0]
     yc = puntosy[0]
     r = puntosx[1]
@@ -262,8 +267,8 @@ def create_menu():
 
 def coordinates_translation():
     global coordx, coordy
-    coordx = entryX.get()
-    coordy = entryY.get()
+    coordx = int(entryX.get())
+    coordy = int(entryY.get())
 
 def create_buttons():
     buton_square = Button(window, text="Square", font=(
@@ -283,6 +288,7 @@ def create_buttons():
     button_translacion.place(x=1540,y=300)
     
     label1 = Label(window, text="x:", fg="white", bg="#1c1c1c", font=("Verdana", 10)).place(x=1570, y=350)
+    global entryX, entryY
     entryX = Entry(window, font=("Arial",15), width=5)
     entryX.pack()
     entryX.place(x=1590,y=350)
