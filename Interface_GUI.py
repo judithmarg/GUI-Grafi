@@ -119,30 +119,37 @@ class BresenhamCanvas(Canvas):
         coordenadas = np.array([x,y,1])
         return np.dot(matriz_translacion, coordenadas)
 
-    def rotacion(self,x,y, grado, pivx, pivy):
-        matriz_translacion = np.array([[1,0,pivx],[0,1,pivy],[0,0,1]])
+    def rotacion2(self,x,y, grado):
+        matriz_translacion = np.array([[1,0,x],[0,1,y],[0,0,1]])
         matriz_rotacion = np.array([[math.cos(grado), -(math.sin(grado)),0],[math.sin(grado),math.cos(grado),0],[0,0,1]])
         multi = np.dot(matriz_translacion, matriz_rotacion)
-        matriz_translacion2 = np.array([[1,0,-pivx],[0,1,-pivy],[0,0,1]])
+        matriz_translacion2 = np.array([[1,0,-x],[0,1,-y],[0,0,1]])
         matriz_final = np.dot(multi, matriz_translacion2)
-        #coordenadas = np.array([x,y,1])
-        #print(coordenadas)
-        #array_float = np.dot(matriz_rotacion, coordenadas)
-        #return canvas.convertPositive(np.asarray(array_float, dtype=int))
         return np.asarray(matriz_final, dtype = int)
-    #def convertPositive(self, array1):
-        #for i in range(0, 3):
-            #a = array1[i]
-            #if a < 0 :
-                #array1[i] = a*-1
-        #return array1
-            
+    
+    def rotacion3(self,x,y,matriz):
+        coordenadas = np.array([x,y,1])
+        array_float = np.dot(matriz, coordenadas)
+        return canvas.convertPositive(np.asarray(array_float, dtype=int))
+        
         
     def escalacion(self,x,y,sx,sy):
         matriz_escalacion = np.array([[sx,0,0],[0,sy,0],[0,0,1]])
         coordenadas = np.array([x,y,1])
         return np.dot(matriz_escalacion, coordenadas)
 
+    def escalacion2(self, x, y, sx, sy):
+        matriz_translacion = np.array([[1,0,x],[0,1,y],[0,0,1]])
+        matriz_escalacion = np.array([[sx,0,0],[0,sy,0],[0,0,1]])
+        multi = np.dot(matriz_translacion, matriz_escalacion)
+        matriz_translacion2 = np.array([[1,0,-x],[0,1,-y],[0,0,1]])
+        matriz_final = np.dot(multi, matriz_translacion2)
+        return np.asarray(matriz_final, dtype = int)
+    
+    def escalacion3(self,x,y,matriz):
+        coordenadas = np.array([x,y,1])
+        return np.dot(matriz, coordenadas)
+        
 thereIsCircle = False
 thereIsRectangle = False
 thereIsSquare = False
@@ -198,9 +205,12 @@ def escalation():
     setpoints_punto_pivote()
     if thereIsCircle:
         setpoints_circ()
-        array = canvas.escalacion(xc ,yc,coorx,coory)
-        print(array[0],array[1],(r*coorx)-array[0])
+        array = canvas.escalacion(xc,yc,coorx,coory)
         draw_circle(array[0],array[1],(r*coorx)-array[0])
+        matrizCal = canvas.escalacion2(pivx,pivy,coorx,coory)
+        arrayAux = canvas.escalacion3(xc,yc,matrizCal)
+        draw_circle(arrayAux[0], arrayAux[1], (r*coorx)-arrayAux[0])
+        
     if thereIsRectangle:
         setpoints_square()
         array2 = canvas.escalacion(x0,y0,coorx,coory)
