@@ -182,20 +182,21 @@ def rotation():
     setpoints_punto_pivote()
     if thereIsCircle:
         setpoints_circ()
-        array = canvas.rotacion(xc ,yc,angulo,pivx, pivy)
-        draw_circle(array[0],array[1],r-array[0])
+        matrizCal = canvas.rotacion2(pivx,pivy,angulo)
+        arrayAux = canvas.rotacion3(xc,yc,matrizCal)
+        draw_circle(arrayAux[0], arrayAux[1], (r*coorx)-arrayAux[0])
     if thereIsRectangle:
         setpoints_square()
-        array2 = canvas.rotacion(x0,y0,angulo,pivx, pivy)
-        print(array2)
-        array3 = canvas.rotacion(x1,y1,angulo,pivx, pivy)
-        print(array3)
+        matrizCal = canvas.rotacion2(pivx,pivy,angulo)
+        array2 = canvas.rotacion3(x0,y0,matrizCal)
+        array3 = canvas.rotacion3(x1,y1,matrizCal)
         draw_rectangle(array2[0], array2[1], array3[0], array3[1])
     if thereIsTriangle:
         setpoints_triangle()
-        array0 = canvas.rotacion(x0,y0,angulo)
-        array1 = canvas.rotacion(x1,y1,angulo)
-        array2 = canvas.rotacion(x2,y2,angulo)
+        matrizCal = canvas.rotacion2(pivx,pivy,angulo)
+        array0 = canvas.rotacion(x0,y0,matrizCal)
+        array1 = canvas.rotacion(x1,y1,matrizCal)
+        array2 = canvas.rotacion(x2,y2,matrizCal)
         draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
 
 def escalation():
@@ -213,16 +214,16 @@ def escalation():
         
     if thereIsRectangle:
         setpoints_square()
-        array2 = canvas.escalacion(x0,y0,coorx,coory)
-        print(array2)
-        array3 = canvas.escalacion(x1,y1,coorx,coory)
-        print(array3)
+        matrizCalc = canvas.escalacion2(pivx,pivy,coorx,coory)
+        array2 = canvas.escalacion3(x0,y0,matrizCalc)
+        array3 = canvas.escalacion3(x1,y1,matrizCalc)
         draw_rectangle(array2[0], array2[1], array3[0], array3[1])
     if thereIsTriangle:
         setpoints_triangle()
-        array0 = canvas.escalacion(x0,y0,coorx,coory)
-        array1 = canvas.escalacion(x1,y1,coorx,coory)
-        array2 = canvas.escalacion(x2,y2,coorx,coory)
+        matrizCal = canvas.escalacion2(pivx,pivy,coorx,coory)
+        array0 = canvas.escalacion3(x0,y0,matrizCal)
+        array1 = canvas.escalacion3(x1,y1,matrizCal)
+        array2 = canvas.escalacion3(x2,y2,matrizCal)
         draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
         
 def drawCircle():
