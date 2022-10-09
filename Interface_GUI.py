@@ -130,7 +130,7 @@ class BresenhamCanvas(Canvas):
     def rotacion3(self,x,y,matriz):
         coordenadas = np.array([x,y,1])
         array_float = np.dot(matriz, coordenadas)
-        return canvas.convertPositive(np.asarray(array_float, dtype=int))
+        return np.asarray(array_float, dtype=int)
         
         
     def escalacion(self,x,y,sx,sy):
