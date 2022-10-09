@@ -119,11 +119,25 @@ class BresenhamCanvas(Canvas):
         coordenadas = np.array([x,y,1])
         return np.dot(matriz_translacion, coordenadas)
 
-    def rotacion(self,x,y, grado):
-        matriz_rotacion = np.array([[math.cos(grado), -(math.sen(grafo)),0],[math.sin(grado),math.cos(grado),0],[0,0,1]])
-        coordenadas = np.array([x,y,1])
-        return np.dot(matriz_rotacion, coordenadas)
-
+    def rotacion(self,x,y, grado, pivx, pivy):
+        matriz_translacion = np.array([[1,0,pivx],[0,1,pivy],[0,0,1]])
+        matriz_rotacion = np.array([[math.cos(grado), -(math.sin(grado)),0],[math.sin(grado),math.cos(grado),0],[0,0,1]])
+        multi = np.dot(matriz_translacion, matriz_rotacion)
+        matriz_translacion2 = np.array([[1,0,-pivx],[0,1,-pivy],[0,0,1]])
+        matriz_final = np.dot(multi, matriz_translacion2)
+        #coordenadas = np.array([x,y,1])
+        #print(coordenadas)
+        #array_float = np.dot(matriz_rotacion, coordenadas)
+        #return canvas.convertPositive(np.asarray(array_float, dtype=int))
+        return np.asarray(matriz_final, dtype = int)
+    #def convertPositive(self, array1):
+        #for i in range(0, 3):
+            #a = array1[i]
+            #if a < 0 :
+                #array1[i] = a*-1
+        #return array1
+            
+        
     def escalacion(self,x,y,sx,sy):
         matriz_escalacion = np.array([[sx,0,0],[0,sy,0],[0,0,1]])
         coordenadas = np.array([x,y,1])
@@ -153,27 +167,54 @@ def translation():
         array1 = canvas.translacion(x1,y1,coordx,coordy)
         array2 = canvas.translacion(x2,y2,coordx,coordy)
         draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
-        
+
 def rotation():
     global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
     canvas.delete('all')
-    coordinates_translation()
+    coordinates_rotation()
+    setpoints_punto_pivote()
     if thereIsCircle:
         setpoints_circ()
-        array = canvas.translacion(xc ,yc,coordx,coordy)
-        draw_circle(array[0],array[1],r-xc)
+        array = canvas.rotacion(xc ,yc,angulo,pivx, pivy)
+        draw_circle(array[0],array[1],r-array[0])
     if thereIsRectangle:
         setpoints_square()
-        array2 = canvas.translacion(x0,y0,coordx,coordy)
-        array3 = canvas.translacion(x1,y1,coordx,coordy)
+        array2 = canvas.rotacion(x0,y0,angulo,pivx, pivy)
+        print(array2)
+        array3 = canvas.rotacion(x1,y1,angulo,pivx, pivy)
+        print(array3)
         draw_rectangle(array2[0], array2[1], array3[0], array3[1])
     if thereIsTriangle:
         setpoints_triangle()
-        array0 = canvas.translacion(x0,y0,coordx,coordy)
-        array1 = canvas.translacion(x1,y1,coordx,coordy)
-        array2 = canvas.translacion(x2,y2,coordx,coordy)
+        array0 = canvas.rotacion(x0,y0,angulo)
+        array1 = canvas.rotacion(x1,y1,angulo)
+        array2 = canvas.rotacion(x2,y2,angulo)
         draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
 
+def escalation():
+    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    canvas.delete('all')
+    coordinates_escalation()
+    setpoints_punto_pivote()
+    if thereIsCircle:
+        setpoints_circ()
+        array = canvas.escalacion(xc ,yc,coorx,coory)
+        print(array[0],array[1],(r*coorx)-array[0])
+        draw_circle(array[0],array[1],(r*coorx)-array[0])
+    if thereIsRectangle:
+        setpoints_square()
+        array2 = canvas.escalacion(x0,y0,coorx,coory)
+        print(array2)
+        array3 = canvas.escalacion(x1,y1,coorx,coory)
+        print(array3)
+        draw_rectangle(array2[0], array2[1], array3[0], array3[1])
+    if thereIsTriangle:
+        setpoints_triangle()
+        array0 = canvas.escalacion(x0,y0,coorx,coory)
+        array1 = canvas.escalacion(x1,y1,coorx,coory)
+        array2 = canvas.escalacion(x2,y2,coorx,coory)
+        draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
+        
 def drawCircle():
     global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
     thereIsCircle = True
@@ -198,10 +239,10 @@ def drawRectangle():
     draw_rectangle(x0, y0, x1, y1)
 
 def draw_rectangle(x0,y0,x1,y1):
-    canvas.draw_line1(x0, y0, x1, y0, color="blue")
-    canvas.draw_line1(x0, y1, x1, y1, color="blue")
-    canvas.draw_line1(x1, y0, x1, y1, color="blue")
-    canvas.draw_line1(x0, y0, x0, y1, color="blue")
+    canvas.draw_line(x0, y0, x1, y0, color="blue")
+    canvas.draw_line(x0, y1, x1, y1, color="blue")
+    canvas.draw_line(x1, y0, x1, y1, color="blue")
+    canvas.draw_line(x0, y0, x0, y1, color="blue")
 
 def drawTriangle():
     global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
@@ -246,6 +287,10 @@ def setpoints_triangle():
     x2 = puntosx[2]
     y2 = puntosy[2]
 
+def setpoints_punto_pivote():
+    global pivx, pivy
+    pivx = puntosx[len(puntosx)-1]
+    pivy = puntosy[len(puntosy)-1]
 
 def savefile():
     file = filedialog.asksaveasfilename(initialdir="C:/",
@@ -272,6 +317,15 @@ def coordinates_translation():
     global coordx, coordy
     coordx = int(entryX.get())
     coordy = int(entryY.get())
+    
+def coordinates_rotation():
+    global angulo
+    angulo = int(entryAngulo.get())
+    
+def coordinates_escalation():
+    global coorx, coory
+    coorx = int(entryX1.get())
+    coory = int(entryY1.get())
 
 def create_buttons():
     buton_square = Button(window, text="Square", font=(
@@ -289,7 +343,6 @@ def create_buttons():
     button_translacion = Button(window, text="Translacion", font=(
         "Comic Sans", 15), width=10, command=translation)
     button_translacion.place(x=1540,y=300)
-    
     label1 = Label(window, text="x:", fg="white", bg="#1c1c1c", font=("Verdana", 10)).place(x=1570, y=350)
     global entryX, entryY
     entryX = Entry(window, font=("Arial",15), width=5)
@@ -300,13 +353,28 @@ def create_buttons():
     entryY.pack()
     entryY.place(x=1690,y=350)
     
-    button_escalar = Button(window, text="Escalar", font=(
-        "Comic Sans", 15), width=10)
-    button_escalar.place(x=1540,y=400)
+    button_rotar = Button(window, text="Rotar", font=(
+        "Comic Sans", 15), width=10, command=rotation)
+    button_rotar.place(x=1540,y=400)
+    label3 = Label(window, text="Angulo:", fg="white", bg="#1c1c1c", font=("Verdana", 10)).place(x=1530, y=450)
+    global entryAngulo
+    entryAngulo = Entry(window, font=("Arial",15), width=5)
+    entryAngulo.pack()
+    entryAngulo.place(x=1590,y=450)
     
-    button_rotar = Button(window, text="Escalar", font=(
-        "Comic Sans", 15), width=10)
-    button_rotar.place(x=1540,y=500)
+    button_escalar = Button(window, text="Escalar", font=(
+        "Comic Sans", 15), width=10, command=escalation)
+    button_escalar.place(x=1540,y=500)
+    label4 = Label(window, text="x:", fg="white", bg="#1c1c1c", font=("Verdana", 10)).place(x=1570, y=550)
+    global entryX1, entryY1
+    entryX1 = Entry(window, font=("Arial",15), width=5)
+    entryX1.pack()
+    entryX1.place(x=1590,y=550)
+    label5 = Label(window, text="y:", fg="white", bg="#1c1c1c", font=("Verdana", 10)).place(x=1670, y=550)
+    entryY1 = Entry(window, font=("Arial",15), width=5)
+    entryY1.pack()
+    entryY1.place(x=1690,y=550)
+    
     
     button_close = Button(window, text="Close",
                           font=("Comic Sans", 15), width=10, command=window.destroy)
