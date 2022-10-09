@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import filedialog
-from PIL import ImageGrab
+from PIL import Image, ImageGrab
 import numpy as np
 import math
 
@@ -129,91 +129,94 @@ class BresenhamCanvas(Canvas):
         coordenadas = np.array([x,y,1])
         return np.dot(matriz_escalacion, coordenadas)
 
+thereIsCircle = False
+thereIsRectangle = False
+thereIsSquare = False
+thereIsTriangle = False
         
 def translation():
-    global xcenter, ycenter, radious
+    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
     canvas.delete('all')
     coordinates_translation()
     if thereIsCircle:
         setpoints_circ()
-        xcenter = xc
-        ycenter = yc
-        radious = r
-        array = canvas.translacion(xcenter,ycenter,coordx,coordy)
-        canvas.draw_circunf(array[0],array[1],radious-xcenter,color="red")
-        xcenter = array[0]
-        ycenter = array[1]
-    elif thereIsRectangle:
+        array = canvas.translacion(xc ,yc,coordx,coordy)
+        draw_circle(array[0],array[1],r-xc)
+    if thereIsRectangle:
         setpoints_square()
-        print(x0)
-        print(y0)
-        print(x1)
-        print(y1)
         array2 = canvas.translacion(x0,y0,coordx,coordy)
         array3 = canvas.translacion(x1,y1,coordx,coordy)
-        canvas.draw_line(array2[0], array2[1], array3[0], array2[1], color="blue")
-        canvas.draw_line(array2[0], array3[1], array3[0], array3[1], color="blue")
-        canvas.draw_line(array3[0], array2[1], array3[0], array3[1], color="blue")
-        canvas.draw_line(array2[0], array2[1], array2[0], array3[1], color="blue")
-    elif thereIsTriangle:
+        draw_rectangle(array2[0], array2[1], array3[0], array3[1])
+    if thereIsTriangle:
         setpoints_triangle()
-        array0 = translacion(x0,y0,coordx,coordy)
-        array1 = translacion(x1,y1,coordx,coordy)
-        array2 = translacion(x2,y2,coordx,coordy)
-        canvas.draw_line(array0[0], array0[1], array1[0], array1[1], color="blue")
-        canvas.draw_line(array1[0], array1[1], array2[0], array2[1], color="blue")
-        canvas.draw_line(array0[0], array0[1], array2[0], array2[1], color="blue")
-     
-       
+        array0 = canvas.translacion(x0,y0,coordx,coordy)
+        array1 = canvas.translacion(x1,y1,coordx,coordy)
+        array2 = canvas.translacion(x2,y2,coordx,coordy)
+        draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
+        
+def rotation():
+    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    canvas.delete('all')
+    coordinates_translation()
+    if thereIsCircle:
+        setpoints_circ()
+        array = canvas.translacion(xc ,yc,coordx,coordy)
+        draw_circle(array[0],array[1],r-xc)
+    if thereIsRectangle:
+        setpoints_square()
+        array2 = canvas.translacion(x0,y0,coordx,coordy)
+        array3 = canvas.translacion(x1,y1,coordx,coordy)
+        draw_rectangle(array2[0], array2[1], array3[0], array3[1])
+    if thereIsTriangle:
+        setpoints_triangle()
+        array0 = canvas.translacion(x0,y0,coordx,coordy)
+        array1 = canvas.translacion(x1,y1,coordx,coordy)
+        array2 = canvas.translacion(x2,y2,coordx,coordy)
+        draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
+
 def drawCircle():
-    global thereIsCircle
+    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
     thereIsCircle = True
     canvas.delete('all')
     thereIsRectangle = False
     thereIsSquare = False
     thereIsTriangle = False 
     setpoints_circ()
-    canvas.draw_circunf(xc,yc,r-xc,color="red")
+    draw_circle(xc, yc, r-xc)
+
+def draw_circle(xcenter, ycenter, radious):
+    canvas.draw_circunf(xcenter,ycenter,radious,color="red")
     
-def drawsquare():
-    global thereIsSquare
-    thereIsSquare = True
-    canvas.delete('all')
-    thereIsCircle = False
-    thereIsRectangle = False
-    thereIsTriangle = False
-    setpoints_square()
-    canvas.draw_line(x0, y0, x1, y1, color="blue")
-    canvas.draw_line(x0, y0, y1, x1, color="blue")
-    canvas.draw_line(x1, y0, x1, x1, color="blue")
-    canvas.draw_line(x0, x1, x1, x1, color="blue")
-    
-def draw_rectangle():
-    global thereIsRectangle
+def drawRectangle():
+    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
     thereIsRectangle = True
     canvas.delete('all')
     thereIsCircle = False
     thereIsSquare = False
     thereIsTriangle = False
     setpoints_square()
+    draw_rectangle(x0, y0, x1, y1)
+
+def draw_rectangle(x0,y0,x1,y1):
     canvas.draw_line1(x0, y0, x1, y0, color="blue")
     canvas.draw_line1(x0, y1, x1, y1, color="blue")
     canvas.draw_line1(x1, y0, x1, y1, color="blue")
     canvas.draw_line1(x0, y0, x0, y1, color="blue")
 
-
-def draw_triangle():
-    global thereIsTriangle
+def drawTriangle():
+    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
     thereIsTriangle = True
     canvas.delete('all')
     thereIsCircle = False
     thereIsRectangle = False
     thereIsSquare = False
     setpoints_triangle()
+    draw_triangle(x0, y0, x1, y1, x2, y2)
+    
+def draw_triangle(x0,y0,x1,y1,x2,y2):
     canvas.draw_line(x0, y0, x1, y1, color="blue")
     canvas.draw_line(x1, y1, x2, y2, color="blue")
     canvas.draw_line(x2, y2, x0, y0, color="blue")
-
 
 def press_button_mouse(event):
     puntosx.append(event.x)
@@ -248,7 +251,7 @@ def savefile():
     file = filedialog.asksaveasfilename(initialdir="C:/",
                                         filetypes=(('PNG File', '.PNG'), ('PNG File', '.PNG')))
     file = file + ".PNG"
-    ImageGrab.grab().crop((150, 150, 500, 500)).save(file)
+    ImageGrab.grab().crop((150, 150, 1500, 1000)).save(file)
 
 
 def clear_canvas():
@@ -272,11 +275,11 @@ def coordinates_translation():
 
 def create_buttons():
     buton_square = Button(window, text="Square", font=(
-        "Comic Sans", 15), width=10, command=draw_rectangle)
+        "Comic Sans", 15), width=10, command=drawRectangle)
     buton_square.place(x=1540, y=150)
 
     buton_triangle = Button(window, text="Triangle",
-                            font=("Comic Sans", 15), width=10, command=draw_triangle)
+                            font=("Comic Sans", 15), width=10, command=drawTriangle)
     buton_triangle.place(x=1540, y=200)
 
     buton_circle = Button(window, text="Circle",
@@ -319,7 +322,7 @@ def create_canvas():
 
 
 def main():
-    global window, frame, puntosx, puntosy
+    global window, frame, puntosx, puntosy, circle
     puntosx = []
     puntosy = []
     window = Tk()
