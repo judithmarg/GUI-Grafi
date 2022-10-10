@@ -5,10 +5,14 @@ import numpy as np
 import math
 
 class BresenhamCanvas(Canvas):
-
+    
     def draw_point(self, x, y, color="red"):
-        self.create_line(x, y, x+1, y+1, fill=color, width=2)
-
+        if self.clippingControl(x,y):
+            self.create_line(x, y, x+1, y+1, fill=color, width=2)
+            
+    def clippingControl (self,x,y):
+        return x < 1900 and y < 1080 and x > 0 and  y > 0
+    
     def draw_line1(self, x0, y0, x1, y1, color="red"):
         dx = abs(x1-x0)
         dy = abs(y1-y0)
@@ -125,14 +129,14 @@ class BresenhamCanvas(Canvas):
         multi = np.dot(matriz_translacion, matriz_rotacion)
         matriz_translacion2 = np.array([[1,0,-x],[0,1,-y],[0,0,1]])
         matriz_final = np.dot(multi, matriz_translacion2)
-        return np.asarray(matriz_final, dtype = int)
+        return matriz_final
     
     def rotacion3(self,x,y,matriz):
         coordenadas = np.array([x,y,1])
         array_float = np.dot(matriz, coordenadas)
         return np.asarray(array_float, dtype=int)
-        
-        
+    
+     
     def escalacion(self,x,y,sx,sy):
         matriz_escalacion = np.array([[sx,0,0],[0,sy,0],[0,0,1]])
         coordenadas = np.array([x,y,1])
@@ -184,19 +188,24 @@ def rotation():
         setpoints_circ()
         matrizCal = canvas.rotacion2(pivx,pivy,angulo)
         arrayAux = canvas.rotacion3(xc,yc,matrizCal)
-        draw_circle(arrayAux[0], arrayAux[1], (r*coorx)-arrayAux[0])
+        draw_circle(arrayAux[0], arrayAux[1], r-xc)
     if thereIsRectangle:
         setpoints_square()
         matrizCal = canvas.rotacion2(pivx,pivy,angulo)
+        print(matrizCal)
         array2 = canvas.rotacion3(x0,y0,matrizCal)
+        print(x0,y0)
+        print(array2)
         array3 = canvas.rotacion3(x1,y1,matrizCal)
+        print(x1, y1)
+        print(array3)
         draw_rectangle(array2[0], array2[1], array3[0], array3[1])
     if thereIsTriangle:
         setpoints_triangle()
         matrizCal = canvas.rotacion2(pivx,pivy,angulo)
-        array0 = canvas.rotacion(x0,y0,matrizCal)
-        array1 = canvas.rotacion(x1,y1,matrizCal)
-        array2 = canvas.rotacion(x2,y2,matrizCal)
+        array0 = canvas.rotacion3(x0,y0,matrizCal)
+        array1 = canvas.rotacion3(x1,y1,matrizCal)
+        array2 = canvas.rotacion3(x2,y2,matrizCal)
         draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
 
 def escalation():
