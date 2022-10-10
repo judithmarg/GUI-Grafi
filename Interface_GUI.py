@@ -118,17 +118,17 @@ class BresenhamCanvas(Canvas):
             self.draw_point(xc+y, yc-x, color)
             self.draw_point(xc-y, yc-x, color)
     
-    def translacion(self, x, y, tx, ty):
-        matriz_translacion = np.array([[1,0,tx],[0,1,ty],[0,0,1]])
+    def traslacion(self, x, y, tx, ty):
+        matriz_traslacion = np.array([[1,0,tx],[0,1,ty],[0,0,1]])
         coordenadas = np.array([x,y,1])
-        return np.dot(matriz_translacion, coordenadas)
+        return np.dot(matriz_traslacion, coordenadas)
 
     def rotacion2(self,x,y, grado):
-        matriz_translacion = np.array([[1,0,x],[0,1,y],[0,0,1]])
+        matriz_traslacion = np.array([[1,0,x],[0,1,y],[0,0,1]])
         matriz_rotacion = np.array([[math.cos(grado), -(math.sin(grado)),0],[math.sin(grado),math.cos(grado),0],[0,0,1]])
-        multi = np.dot(matriz_translacion, matriz_rotacion)
-        matriz_translacion2 = np.array([[1,0,-x],[0,1,-y],[0,0,1]])
-        matriz_final = np.dot(multi, matriz_translacion2)
+        multi = np.dot(matriz_traslacion, matriz_rotacion)
+        matriz_traslacion2 = np.array([[1,0,-x],[0,1,-y],[0,0,1]])
+        matriz_final = np.dot(multi, matriz_traslacion2)
         return matriz_final
     
     def rotacion3(self,x,y,matriz):
@@ -143,11 +143,11 @@ class BresenhamCanvas(Canvas):
         return np.dot(matriz_escalacion, coordenadas)
 
     def escalacion2(self, x, y, sx, sy):
-        matriz_translacion = np.array([[1,0,x],[0,1,y],[0,0,1]])
+        matriz_traslacion = np.array([[1,0,x],[0,1,y],[0,0,1]])
         matriz_escalacion = np.array([[sx,0,0],[0,sy,0],[0,0,1]])
-        multi = np.dot(matriz_translacion, matriz_escalacion)
-        matriz_translacion2 = np.array([[1,0,-x],[0,1,-y],[0,0,1]])
-        matriz_final = np.dot(multi, matriz_translacion2)
+        multi = np.dot(matriz_traslacion, matriz_escalacion)
+        matriz_traslacion2 = np.array([[1,0,-x],[0,1,-y],[0,0,1]])
+        matriz_final = np.dot(multi, matriz_traslacion2)
         return np.asarray(matriz_final, dtype = int)
     
     def escalacion3(self,x,y,matriz):
@@ -159,24 +159,24 @@ thereIsRectangle = False
 thereIsSquare = False
 thereIsTriangle = False
         
-def translation():
+def traslation():
     global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
     canvas.delete('all')
-    coordinates_translation()
+    coordinates_traslation()
     if thereIsCircle:
         setpoints_circ()
-        array = canvas.translacion(xc ,yc,coordx,coordy)
+        array = canvas.traslacion(xc ,yc,coordx,coordy)
         draw_circle(array[0],array[1],r-xc)
     if thereIsRectangle:
         setpoints_square()
-        array2 = canvas.translacion(x0,y0,coordx,coordy)
-        array3 = canvas.translacion(x1,y1,coordx,coordy)
+        array2 = canvas.traslacion(x0,y0,coordx,coordy)
+        array3 = canvas.traslacion(x1,y1,coordx,coordy)
         draw_rectangle(array2[0], array2[1], array3[0], array3[1])
     if thereIsTriangle:
         setpoints_triangle()
-        array0 = canvas.translacion(x0,y0,coordx,coordy)
-        array1 = canvas.translacion(x1,y1,coordx,coordy)
-        array2 = canvas.translacion(x2,y2,coordx,coordy)
+        array0 = canvas.traslacion(x0,y0,coordx,coordy)
+        array1 = canvas.traslacion(x1,y1,coordx,coordy)
+        array2 = canvas.traslacion(x2,y2,coordx,coordy)
         draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
 
 def rotation():
@@ -333,7 +333,7 @@ def create_menu():
     options1.add_command(label="Save", command=savefile)
     menu_bar.add_cascade(label="Options", menu=options1)
 
-def coordinates_translation():
+def coordinates_traslation():
     global coordx, coordy
     coordx = int(entryX.get())
     coordy = int(entryY.get())
@@ -360,9 +360,9 @@ def create_buttons():
                           font=("Comic Sans", 15), width=10, command=drawCircle)
     buton_circle.place(x=1540, y=250)
 
-    button_translacion = Button(window, text="Translacion", font=(
-        "Comic Sans", 15), width=10, command=translation)
-    button_translacion.place(x=1540,y=300)
+    button_traslacion = Button(window, text="Trasladar", font=(
+        "Comic Sans", 15), width=10, command=traslation)
+    button_traslacion.place(x=1540,y=300)
     label1 = Label(window, text="x:", fg="white", bg="#1c1c1c", font=("Verdana", 10)).place(x=1570, y=350)
     global entryX, entryY
     entryX = Entry(window, font=("Arial",15), width=5)
