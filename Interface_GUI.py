@@ -4,13 +4,149 @@ from PIL import ImageGrab
 from cv2 import circle
 import numpy as np
 import math
+import sys 
+
+sys.setrecursionlimit(2000000000)
+rows=1500
+cols=1700
+mat = [[0 for _ in range(cols)] for _ in range(rows)]
+def init():
+    global mat
+    for i in range(0,rows):
+        for l in range(0,cols):
+            mat[i][l]='none'
+            #print(i,"  ",l," = ",mat[i][l])
+dondex=-1
+dondey=-1
+dx = [0,0,1,-1]
+dy = [1,-1,0,0]
+#dx = [0,0,1,-1,1,-1,-1,1]
+#dy = [1,-1,0,0,1,-1,1,-1]
 
 class BresenhamCanvas(Canvas):
 
     def draw_point(self, x, y, color):
+        global mat
+        mat[x][y]=color
         if self.clippingControl(x,y):
             self.create_line(x, y, x+1, y+1, fill=color, width=2)
+    
+    def bresenham(self,x0,y0,x1,y1,color="red"):
+            dx = abs(x1-x0)
+            dy = abs(y1-y0)
+            p=2*dy-dx
+            incE=2*dy
+            incNE=2*(dy-dx)
+            global dondex
+            global dondey
             
+            if dx>dy:
+                if x0>x1:
+                    x=x1
+                    y=y1
+                    xend=x0
+                    yend=y0
+                else:
+                    x=x0
+                    y=y0
+                    xend=x1
+                    yend=y1
+                ayuda=0
+                if y0>y1:
+                    x0,x1=x1,x0
+                    y0,y1=y1,y0
+                for i in range(x,xend):
+                    if ayuda==3 :
+                        if dondex==-1: dondex=x
+                        if dondey==-1: dondey=y
+                    ayuda+=1
+                    self.draw_point(x, y, color=color)
+                    x=x+1 if x<x1 else x-1
+                    if p<0:
+                        p+=incE
+                    else:
+                        y=y+1 if y<y1 else y-1
+                        p+=incNE
+            else:
+                p=2*dx-dy
+                incE=2*dx
+                incNE=2*(dx-dy)
+                if y0>y1:
+                    y=y1
+                    x=x1
+                    yend=y0
+                    xend=x0
+                else:
+                    y=y0
+                    x=x0
+                    yend=y1
+                    xend=x1
+                if y0>y1:
+                    x0,x1=x1,x0
+                    y0,y1=y1,y0
+                ayuda=0;
+                for i in range(y,yend):
+                    if ayuda==3 :
+                        if dondex==-1: dondex=x
+                        if dondey==-1: dondey=y
+                    ayuda+=1
+                    self.draw_point(x, y, color=color)
+                    y=y+1 if y<y1 else y-1
+                    if p<0:
+                        p+=incE
+                    else:
+                        x=x+1 if x<x1 else x-1
+                        p+=incNE
+    
+    def linea(self,x1,y1,x2,y2,ancho,color="red"):
+        
+        BresenhamCanvas.bresenham(self,x1,y1,x2,y2,color)
+        if ancho==0:
+            return
+        vx=x2-x1
+        vy=y2-y1
+        #vector A,B extermos de la linea
+
+        #perpendicular a AB
+        wx=vy
+        wy=-vx
+        modulo=math.sqrt(wx*wx+wy*wy)
+        wx/=modulo
+        wy/=modulo
+        modulo=math.sqrt(vx*vx+vy*vy)
+        vx/=modulo
+        vy/=modulo
+        arribax=int(x1+wx*ancho)
+        arribay=int(y1+wy*ancho)
+        abajox=int(x1-wx*ancho)
+        abajoy=int(y1-wy*ancho)
+        BresenhamCanvas.bresenham(self,abajox,abajoy,arribax,arribay,color);
+        arribax2=int(x2+wx*ancho)
+        arribay2=int(y2+wy*ancho)
+        abajox2=int(x2-wx*ancho)
+        abajoy2=int(y2-wy*ancho)
+
+        BresenhamCanvas.bresenham(self,abajox2,abajoy2,arribax2,arribay2,color)
+        BresenhamCanvas.bresenham(self,arribax,arribay,arribax2,arribay2,color)
+        BresenhamCanvas.bresenham(self,abajox,abajoy,abajox2,abajoy2,color)
+        #print("donde  ",dondex," ",dondey)
+        if ancho>1 : BresenhamCanvas.floodfill(self,dondex,dondey,color)
+        #bresenham(arribax,arribay,abajox,abajoy)
+        #floodfill(blank,abajox,abajoy,0)
+        
+    def floodfill(self,x,y,color="red"):
+            global mat
+            self.draw_point(x, y,color)
+            for i in range(len(dx)):
+                x1=x+dx[i]
+                y1=y+dy[i]
+                if(x1>0 and y1>0 and mat[x1][y1]=="none"):
+                    BresenhamCanvas.floodfill(self,x1,y1,color)
+    def drawLineaConGrosor(self):
+        setpoints_lineaCG()
+        #self.linea(300, 300, 5, 200, 5)
+        self.linea(x0, y0, x1, y1, groso) 
+
     def clippingControl (self,x,y):
         return x < 1900 and y < 1080 and x > 0 and  y > 0
     
@@ -406,7 +542,25 @@ def drawTriangle1():
     thereIsSquare = False
     triangle1.drawTriangle()
     
+def drawLineaconGrosor1():
+    canvas.delete('all')
+    #clear_canvas()
+    thereIsCircle = False
+    thereIsRectangle = False
+    thereIsSquare = False
+    thereIsTriangle = False
+    inLinea()
+    canvas.drawLineaConGrosor()
+    #clear_canvas()
 
+def limpiar():
+    clear_canvas()
+    init()
+    global donde,dondey
+    dondex=-1
+    dondey=-1
+    puntosx.clear()
+    puntosy.clear()
 
 def press_button_mouse(event):
     puntosx.append(event.x)
@@ -441,26 +595,40 @@ def setpoints_punto_pivote():
     pivx = puntosx[len(puntosx)-1]
     pivy = puntosy[len(puntosy)-1]
 
+def setpoints_lineaCG():
+    global x0, y0, x1, y1, x2, y2
+    x0 = puntosx[0]
+    y0 = puntosy[0]
+    x1 = puntosx[1]
+    y1 = puntosy[1]
+
 def savefile():
     file = filedialog.asksaveasfilename(initialdir="C:/",
                                         filetypes=(('PNG File', '.PNG'), ('PNG File', '.PNG')))
     file = file + ".PNG"
     ImageGrab.grab().crop((150, 150, 1500, 1000)).save(file)
 
-
 def clear_canvas():
+    init()
+    global dondex,dondey
+    dondey=-1
+    dondex=-1
     canvas.delete('all')
     puntosx.clear()
     puntosy.clear()
 
-
 def create_menu():
+    init()
     menu_bar = Menu(window)
     window.config(menu=menu_bar)
     options1 = Menu(menu_bar, tearoff=0)
     options1.add_command(label="Clear", command=clear_canvas)
     options1.add_command(label="Save", command=savefile)
     menu_bar.add_cascade(label="Options", menu=options1)
+
+def inLinea():
+    global groso
+    groso = int(entryGrosor.get())
 
 def coordinates_traslation():
     global coordx, coordy
@@ -488,7 +656,20 @@ def create_buttons():
     buton_circle = Button(window, text="Circle",
                             font=("Comic Sans", 15), width=10, command=drawCircle1)
     buton_circle.place(x=1540, y=250)
-
+       #
+    button_linea_grosor = Button(window, text="Linea", 
+                            font=("Comic Sans", 15), width=10, command=drawLineaconGrosor1)
+    button_linea_grosor.place(x=1540, y=650)
+    label1 = Label(window, text="grosor:", fg="white", bg="#1c1c1c", font=("Verdana", 10)).place(x=1530, y=700)
+    global entryGrosor
+    entryGrosor = Entry(window, font=("Arial",15), width=5)
+    entryGrosor.pack()
+    entryGrosor.place(x=1600,y=700)
+    
+    button_linea_grosor = Button(window, text="Clean", 
+                            font=("Comic Sans", 15), width=10, command=limpiar)
+    button_linea_grosor.place(x=1540, y=750)
+     #
     button_traslacion = Button(window, text="Trasladar", font=(
         "Comic Sans", 15), width=10, command=traslation)
     button_traslacion.place(x=1540,y=300)
