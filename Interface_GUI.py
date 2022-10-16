@@ -1,12 +1,13 @@
 from tkinter import *
 from tkinter import filedialog
-from PIL import Image, ImageGrab
+from PIL import ImageGrab
+from cv2 import circle
 import numpy as np
 import math
 
 class BresenhamCanvas(Canvas):
-    
-    def draw_point(self, x, y, color="red"):
+
+    def draw_point(self, x, y, color):
         if self.clippingControl(x,y):
             self.create_line(x, y, x+1, y+1, fill=color, width=2)
             
@@ -125,7 +126,7 @@ class BresenhamCanvas(Canvas):
 
     def rotacion2(self,x,y, grado):
         matriz_traslacion = np.array([[1,0,x],[0,1,y],[0,0,1]])
-        matriz_rotacion = np.array([[math.cos(grado), -(math.sin(grado)),0],[math.sin(grado),math.cos(grado),0],[0,0,1]])
+        matriz_rotacion = np.array([[math.cos(grado), (math.sin(grado)),0],[-(math.sin(grado)),math.cos(grado),0],[0,0,1]])
         multi = np.dot(matriz_traslacion, matriz_rotacion)
         matriz_traslacion2 = np.array([[1,0,-x],[0,1,-y],[0,0,1]])
         matriz_final = np.dot(multi, matriz_traslacion2)
@@ -135,7 +136,6 @@ class BresenhamCanvas(Canvas):
         coordenadas = np.array([x,y,1])
         array_float = np.dot(matriz, coordenadas)
         return np.asarray(array_float, dtype=int)
-    
      
     def escalacion(self,x,y,sx,sy):
         matriz_escalacion = np.array([[sx,0,0],[0,sy,0],[0,0,1]])
@@ -158,126 +158,255 @@ thereIsCircle = False
 thereIsRectangle = False
 thereIsSquare = False
 thereIsTriangle = False
-        
+
+class Circle:
+
+    def __init__(self):
+        self.xcenterP = 0
+        self.ycenterP = 0
+        self.radiousP = 10
+    
+    def modify(self,xcenter,ycenter, radious):
+        self.xcenterP = xcenter
+        self.ycenterP = ycenter
+        self.radiousP = radious
+    
+    def draw_circle(self,xcenter, ycenter, radious):
+        canvas.draw_circunf(xcenter,ycenter,radious,color="red") 
+        self.modify(xcenter,ycenter,radious)
+
+    def drawCircle(self):
+        setpoints_circ()
+        self.draw_circle(xc, yc, r-xc)
+        self.modify(xc,yc,r-xc)   
+    
+    def traslation_circle(self):
+        global xcenterP, ycenterP, radiousP
+        coordinates_traslation()
+        array = canvas.traslacion(self.xcenterP ,self.ycenterP,coordx,coordy)
+        self.draw_circle(array[0],array[1],self.radiousP)
+    
+    def rotation_circle(self):
+        global xcenterP, ycenterP, radiousP
+        coordinates_rotation()
+        setpoints_punto_pivote()
+        matrizCal = canvas.rotacion2(pivx,pivy,angulo)
+        arrayAux = canvas.rotacion3(self.xcenterP,self.ycenterP,matrizCal)
+        self.draw_circle(arrayAux[0], arrayAux[1], self.radiousP)
+    
+    def escalation_circle(self):
+        global xcenterP, ycenterP, radiousP
+        coordinates_escalation()
+        setpoints_punto_pivote()
+        #array = canvas.escalacion(self.xcenterP,self.ycenterP,coorx,coory) #demostracion
+        #self.draw_circle(array[0],array[1],(self.radiousP*coorx)-array[0]) #demostracion
+        matrizCal = canvas.escalacion2(pivx,pivy,coorx,coory)
+        arrayAux = canvas.escalacion3(self.xcenterP,self.ycenterP,matrizCal)
+        self.draw_circle(arrayAux[0], arrayAux[1], (self.radiousP*coorx))
+
+class Rectangle:
+    
+    def __init__(self):
+        self.x0P = 0
+        self.y0P = 0
+        self.x1P = 2
+        self.y1P = 2 
+        self.x2P = 2
+        self.y2P = 0
+        self.x3P = 2
+        self.y3P = 0 
+
+    def modify(self,x0,y0,x1,y1):
+        self.x0P = x0
+        self.y0P = y0
+        self.x1P = x1
+        self.y1P = y1
+    
+    def modify2(self,x0,y0,x1,y1,x2,y2,x3,y3):
+        self.modify(x0,y0,x1,y1)
+        self.x2P = x2
+        self.y2P = y2
+        self.x3P = x3
+        self.y3P = y3
+
+    def draw_rectangle(self,x0,y0,x1,y1):
+        canvas.draw_line(x0, y0, x1, y0, color="blue")
+        canvas.draw_line(x0, y1, x1, y1, color="blue")
+        canvas.draw_line(x1, y0, x1, y1, color="blue")
+        canvas.draw_line(x0, y0, x0, y1, color="blue")
+        self.modify(x0,y0,x1,y1)
+
+    def draw_rectangle2(self,x0,y0,x1,y1,x2,y2,x3,y3):
+        canvas.draw_line(x0, y0, x2, y2, color="blue")
+        canvas.draw_line(x0, y0, x3, y3, color="blue")
+        canvas.draw_line(x3, y3, x1, y1, color="blue")
+        canvas.draw_line(x2, y2, x1, y1, color="blue")
+        self.modify2(x0,y0,x1,y1,x2,y2,x3,y3)
+
+    def drawRectangle(self):
+        setpoints_square()
+        self.draw_rectangle(x0, y0, x1, y1)
+        self.modify(x0,y0,x1,y1)   
+    
+    def traslation_rectangle(self):
+        global x0P,y0P,x1P,y1P
+        coordinates_traslation()
+        array2 = canvas.traslacion(self.x0P,self.y0P,coordx,coordy)
+        array3 = canvas.traslacion(self.x1P,self.y1P,coordx,coordy)
+        self.draw_rectangle(array2[0], array2[1], array3[0], array3[1])
+    
+    def rotation_rectangle(self):
+        global x0P,y0P,x1P,y1P,x2P,y2P,x3P,y3P
+        coordinates_rotation()
+        setpoints_punto_pivote()
+        self.x2P,self.y2P = self.x1P,self.y0P
+        self.x3P,self.y3P = self.x0P,self.y1P
+        matrizCal = canvas.rotacion2(pivx,pivy,angulo)
+        array2 = canvas.rotacion3(self.x0P,self.y0P,matrizCal)
+        array3 = canvas.rotacion3(self.x1P,self.y1P,matrizCal)
+        array4 = canvas.rotacion3(self.x2P,self.y2P,matrizCal)
+        array5 = canvas.rotacion3(self.x3P,self.y3P,matrizCal)
+        self.draw_rectangle2(array2[0], array2[1], array3[0], array3[1],array4[0], array4[1], array5[0], array5[1])
+    
+    def escalation_rectangle(self):
+        global x0P,y0P,x1P,y1P
+        coordinates_escalation()
+        setpoints_punto_pivote()
+        matrizCalc = canvas.escalacion2(pivx,pivy,coorx,coory)
+        array2 = canvas.escalacion3(self.x0P,self.y0P,matrizCalc)
+        array3 = canvas.escalacion3(self.x1P,self.y1P,matrizCalc)
+        self.draw_rectangle(array2[0], array2[1], array3[0], array3[1])
+
+class Triangle:
+
+    def __init__(self):
+        self.x0p = 0
+        self.y0p = 0
+        self.x1p = 0
+        self.y1p = 0
+        self.x2p = 0
+        self.y2p = 0
+    
+    def modify(self,x0,y0,x1,y1,x2,y2):
+        self.x0p = x0
+        self.y0p = y0
+        self.x1p = x1
+        self.y1p = y1
+        self.x2p = x2
+        self.y2p = y2
+    
+    def draw_triangle(self,x0,y0,x1,y1,x2,y2):
+        canvas.draw_line(x0, y0, x1, y1, color="blue")
+        canvas.draw_line(x1, y1, x2, y2, color="blue")
+        canvas.draw_line(x2, y2, x0, y0, color="blue")
+        self.modify(x0,y0,x1,y1,x2,y2)
+
+    def drawTriangle(self):
+        setpoints_triangle()
+        self.draw_triangle(x0, y0, x1, y1, x2, y2)
+        self.modify(x0, y0, x1, y1, x2, y2)   
+    
+    def traslation_triangle(self):
+        global x0p,y0p,x1p,y1p,x2p,y2p
+        coordinates_traslation()
+        setpoints_triangle()
+        array0 = canvas.traslacion(self.x0p,self.y0p,coordx,coordy)
+        array1 = canvas.traslacion(self.x1p,self.y1p,coordx,coordy)
+        array2 = canvas.traslacion(self.x2p,self.y2p,coordx,coordy)
+        self.draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
+    
+    def rotation_triangle(self):
+        global x0p,y0p,x1p,y1p,x2p,y2p
+        coordinates_rotation()
+        setpoints_punto_pivote()
+        matrizCal = canvas.rotacion2(pivx,pivy,angulo)
+        array0 = canvas.rotacion3(self.x0p,self.y0p,matrizCal)
+        array1 = canvas.rotacion3(self.x1p,self.y1p,matrizCal)
+        array2 = canvas.rotacion3(self.x2p,self.y2p,matrizCal)
+        self.draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
+    
+    def escalation_triangle(self):
+        global x0p,y0p,x1p,y1p,x2p,y2p
+        coordinates_escalation()
+        setpoints_punto_pivote()
+        setpoints_triangle()
+        matrizCal = canvas.escalacion2(pivx,pivy,coorx,coory)
+        array0 = canvas.escalacion3(self.x0p,self.y0p,matrizCal)
+        array1 = canvas.escalacion3(self.x1p,self.y1p,matrizCal)
+        array2 = canvas.escalacion3(self.x2p,self.y2p,matrizCal)
+        self.draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
+
+circle1 = Circle()
+rectangle1 = Rectangle()
+triangle1 = Triangle()
+
 def traslation():
     global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    global circle1,rectangle1
     canvas.delete('all')
-    coordinates_traslation()
     if thereIsCircle:
-        setpoints_circ()
-        array = canvas.traslacion(xc ,yc,coordx,coordy)
-        draw_circle(array[0],array[1],r-xc)
+        circle1.traslation_circle()
     if thereIsRectangle:
-        setpoints_square()
-        array2 = canvas.traslacion(x0,y0,coordx,coordy)
-        array3 = canvas.traslacion(x1,y1,coordx,coordy)
-        draw_rectangle(array2[0], array2[1], array3[0], array3[1])
+        rectangle1.traslation_rectangle()
     if thereIsTriangle:
-        setpoints_triangle()
-        array0 = canvas.traslacion(x0,y0,coordx,coordy)
-        array1 = canvas.traslacion(x1,y1,coordx,coordy)
-        array2 = canvas.traslacion(x2,y2,coordx,coordy)
-        draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
+        triangle1.traslation_triangle()
 
 def rotation():
     global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    global circle1,rectangle1
     canvas.delete('all')
     coordinates_rotation()
     setpoints_punto_pivote()
     if thereIsCircle:
-        setpoints_circ()
-        matrizCal = canvas.rotacion2(pivx,pivy,angulo)
-        arrayAux = canvas.rotacion3(xc,yc,matrizCal)
-        draw_circle(arrayAux[0], arrayAux[1], r-xc)
+        circle1.rotation_circle()
     if thereIsRectangle:
-        setpoints_square()
-        matrizCal = canvas.rotacion2(pivx,pivy,angulo)
-        print(matrizCal)
-        array2 = canvas.rotacion3(x0,y0,matrizCal)
-        print(x0,y0)
-        print(array2)
-        array3 = canvas.rotacion3(x1,y1,matrizCal)
-        print(x1, y1)
-        print(array3)
-        draw_rectangle(array2[0], array2[1], array3[0], array3[1])
+        rectangle1.rotation_rectangle()
     if thereIsTriangle:
-        setpoints_triangle()
-        matrizCal = canvas.rotacion2(pivx,pivy,angulo)
-        array0 = canvas.rotacion3(x0,y0,matrizCal)
-        array1 = canvas.rotacion3(x1,y1,matrizCal)
-        array2 = canvas.rotacion3(x2,y2,matrizCal)
-        draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
+        triangle1.rotation_triangle()
 
 def escalation():
     global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    global circle1,rectangle1
     canvas.delete('all')
     coordinates_escalation()
     setpoints_punto_pivote()
     if thereIsCircle:
-        setpoints_circ()
-        array = canvas.escalacion(xc,yc,coorx,coory)
-        draw_circle(array[0],array[1],(r*coorx)-array[0])
-        matrizCal = canvas.escalacion2(pivx,pivy,coorx,coory)
-        arrayAux = canvas.escalacion3(xc,yc,matrizCal)
-        draw_circle(arrayAux[0], arrayAux[1], (r*coorx)-arrayAux[0])
-        
+        circle1.escalation_circle()
     if thereIsRectangle:
         setpoints_square()
-        matrizCalc = canvas.escalacion2(pivx,pivy,coorx,coory)
-        array2 = canvas.escalacion3(x0,y0,matrizCalc)
-        array3 = canvas.escalacion3(x1,y1,matrizCalc)
-        draw_rectangle(array2[0], array2[1], array3[0], array3[1])
+        rectangle1.escalation_rectangle()
     if thereIsTriangle:
-        setpoints_triangle()
-        matrizCal = canvas.escalacion2(pivx,pivy,coorx,coory)
-        array0 = canvas.escalacion3(x0,y0,matrizCal)
-        array1 = canvas.escalacion3(x1,y1,matrizCal)
-        array2 = canvas.escalacion3(x2,y2,matrizCal)
-        draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
+        triangle1.escalation_triangle()
         
-def drawCircle():
+def drawCircle1():
     global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    global circle1
     thereIsCircle = True
     canvas.delete('all')
     thereIsRectangle = False
     thereIsSquare = False
     thereIsTriangle = False 
-    setpoints_circ()
-    draw_circle(xc, yc, r-xc)
+    circle1.drawCircle()
 
-def draw_circle(xcenter, ycenter, radious):
-    canvas.draw_circunf(xcenter,ycenter,radious,color="red")
-    
-def drawRectangle():
+def drawRectangle1():
     global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
     thereIsRectangle = True
     canvas.delete('all')
     thereIsCircle = False
     thereIsSquare = False
     thereIsTriangle = False
-    setpoints_square()
-    draw_rectangle(x0, y0, x1, y1)
+    rectangle1.drawRectangle()
 
-def draw_rectangle(x0,y0,x1,y1):
-    canvas.draw_line(x0, y0, x1, y0, color="blue")
-    canvas.draw_line(x0, y1, x1, y1, color="blue")
-    canvas.draw_line(x1, y0, x1, y1, color="blue")
-    canvas.draw_line(x0, y0, x0, y1, color="blue")
-
-def drawTriangle():
+def drawTriangle1():
     global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
     thereIsTriangle = True
     canvas.delete('all')
     thereIsCircle = False
     thereIsRectangle = False
     thereIsSquare = False
-    setpoints_triangle()
-    draw_triangle(x0, y0, x1, y1, x2, y2)
+    triangle1.drawTriangle()
     
-def draw_triangle(x0,y0,x1,y1,x2,y2):
-    canvas.draw_line(x0, y0, x1, y1, color="blue")
-    canvas.draw_line(x1, y1, x2, y2, color="blue")
-    canvas.draw_line(x2, y2, x0, y0, color="blue")
+
 
 def press_button_mouse(event):
     puntosx.append(event.x)
@@ -348,16 +477,16 @@ def coordinates_escalation():
     coory = int(entryY1.get())
 
 def create_buttons():
-    buton_square = Button(window, text="Square", font=(
-        "Comic Sans", 15), width=10, command=drawRectangle)
+    buton_square = Button(window, text="Square", 
+                            font=("Comic Sans", 15), width=10, command=drawRectangle1)
     buton_square.place(x=1540, y=150)
 
     buton_triangle = Button(window, text="Triangle",
-                            font=("Comic Sans", 15), width=10, command=drawTriangle)
+                            font=("Comic Sans", 15), width=10, command=drawTriangle1)
     buton_triangle.place(x=1540, y=200)
 
     buton_circle = Button(window, text="Circle",
-                          font=("Comic Sans", 15), width=10, command=drawCircle)
+                            font=("Comic Sans", 15), width=10, command=drawCircle1)
     buton_circle.place(x=1540, y=250)
 
     button_traslacion = Button(window, text="Trasladar", font=(
@@ -425,6 +554,7 @@ def main():
     frame = Frame(window, width=1500, height=1000, bg="white")
     frame.pack(side=LEFT)
     create_canvas()
+    
     window.mainloop()
 
 
