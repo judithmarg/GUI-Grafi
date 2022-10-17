@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import filedialog
+from turtle import xcor
 from PIL import ImageGrab
 from cv2 import circle
 import numpy as np
@@ -22,6 +23,7 @@ dx = [0,0,1,-1]
 dy = [1,-1,0,0]
 dx8 = [0,0,1,-1,1,-1,-1,1]
 dy8 = [1,-1,0,0,1,-1,1,-1]
+punteada=False
 def floodfill1():
     init()
     global x0, y0
@@ -60,7 +62,7 @@ class BresenhamCanvas(Canvas):
             incE=2*dy
             incNE=2*(dy-dx)
             global dondex
-            global dondey
+            global dondey,punteada
             
             if dx>dy:
                 if x0>x1:
@@ -82,7 +84,11 @@ class BresenhamCanvas(Canvas):
                         if dondex==-1: dondex=x
                         if dondey==-1: dondey=y
                     ayuda+=1
-                    self.draw_point(x, y, color=color)
+                    if punteada==True:
+                        if int(ayuda/10)%2==1:    
+                            self.draw_point(x, y, color=color)
+                    else:
+                        self.draw_point(x, y, color=color)
                     x=x+1 if x<x1 else x-1
                     if p<0:
                         p+=incE
@@ -646,7 +652,8 @@ def drawLineaconGrosor1():
 def limpiar():
     clear_canvas()
     init()
-    global donde,dondey
+    global donde,dondey,punteada
+    punteada=False
     dondex=-1
     dondey=-1
     puntosx.clear()
@@ -734,6 +741,11 @@ def coordinates_escalation():
     coorx = int(entryX1.get())
     coory = int(entryY1.get())
 
+def cambiarPunteada():
+    global punteada
+    punteada=True
+    drawLineaconGrosor1()
+
 def create_buttons():
     buton_square = Button(window, text="Square", 
                             font=("Comic Sans", 15), width=10, command=drawRectangle1)
@@ -755,10 +767,14 @@ def create_buttons():
     entryGrosor = Entry(window, font=("Arial",15), width=5)
     entryGrosor.pack()
     entryGrosor.place(x=1600,y=700)
-    
-    button_linea_grosor = Button(window, text="Clean", 
+    #boton de linea punteada
+    button_linea_grosor1 = Button(window, text="Punteada", 
+                            font=("Comic Sans", 15), width=10, command=cambiarPunteada)
+    button_linea_grosor1.place(x=1540, y=850)
+    #boton de limpiar
+    button_linea_grosor2 = Button(window, text="Clean", 
                             font=("Comic Sans", 15), width=10, command=limpiar)
-    button_linea_grosor.place(x=1540, y=750)
+    button_linea_grosor2.place(x=1540, y=750)
     #boton de rellenar
     button_linea_grosor = Button(window, text="Rellenar", 
                             font=("Comic Sans", 15), width=10, command=floodfill1)
