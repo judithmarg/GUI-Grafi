@@ -20,8 +20,16 @@ dondex=-1
 dondey=-1
 dx = [0,0,1,-1]
 dy = [1,-1,0,0]
-#dx = [0,0,1,-1,1,-1,-1,1]
-#dy = [1,-1,0,0,1,-1,1,-1]
+dx8 = [0,0,1,-1,1,-1,-1,1]
+dy8 = [1,-1,0,0,1,-1,1,-1]
+def floodfill1():
+    init()
+    global x0, y0
+    global mat
+    SZ=len(puntosx)
+    x0 = puntosx[SZ-1]
+    y0 = puntosy[SZ-1]
+    canvas.FloodFill()
 
 class BresenhamCanvas(Canvas):
 
@@ -31,6 +39,20 @@ class BresenhamCanvas(Canvas):
         if self.clippingControl(x,y):
             self.create_line(x, y, x+1, y+1, fill=color, width=2)
     
+    def FloodFill(self):
+        #self.linea(100, 100, 60, 500, 1) 
+        #self.draw_point(500, 500, color="red")
+        #self.floodFillReal(10,10,"none","red")
+        self.floodFillReal(x0,y0,"none","red")
+    def floodFillReal(self, x, y, antiguo, nuevo):
+        
+        mat[x][y]="red"
+        for i in range(len(dx)):
+            x1=x+dx[i]
+            y1=y+dy[i]
+            if(x1>0 and y1>0 and x1<1000 and y1<1000 and mat[x1][y1]=="none"):
+                self.floodFillReal(x1,y1,antiguo, nuevo)
+
     def bresenham(self,x0,y0,x1,y1,color="red"):
             dx = abs(x1-x0)
             dy = abs(y1-y0)
@@ -56,7 +78,7 @@ class BresenhamCanvas(Canvas):
                     x0,x1=x1,x0
                     y0,y1=y1,y0
                 for i in range(x,xend):
-                    if ayuda==3 :
+                    if ayuda==29 :
                         if dondex==-1: dondex=x
                         if dondey==-1: dondey=y
                     ayuda+=1
@@ -86,7 +108,7 @@ class BresenhamCanvas(Canvas):
                     y0,y1=y1,y0
                 ayuda=0;
                 for i in range(y,yend):
-                    if ayuda==3 :
+                    if ayuda==29 :
                         if dondex==-1: dondex=x
                         if dondey==-1: dondey=y
                     ayuda+=1
@@ -131,6 +153,8 @@ class BresenhamCanvas(Canvas):
         BresenhamCanvas.bresenham(self,abajox,abajoy,abajox2,abajoy2,color)
         #print("donde  ",dondex," ",dondey)
         if ancho>1 : BresenhamCanvas.floodfill(self,dondex,dondey,color)
+        #dondex=-1
+        #dondey=-1
         #bresenham(arribax,arribay,abajox,abajoy)
         #floodfill(blank,abajox,abajoy,0)
         
@@ -142,10 +166,16 @@ class BresenhamCanvas(Canvas):
                 y1=y+dy[i]
                 if(x1>0 and y1>0 and mat[x1][y1]=="none"):
                     BresenhamCanvas.floodfill(self,x1,y1,color)
+    
     def drawLineaConGrosor(self):
         setpoints_lineaCG()
         #self.linea(300, 300, 5, 200, 5)
         self.linea(x0, y0, x1, y1, groso) 
+    
+    def drawLineaConGrosorFiguras(self,x,y,xe,ye):
+        setpoints_lineaCG()
+        #self.linea(300, 300, 5, 200, 5)
+        self.linea(x,y,xe,ye, groso) 
 
     def clippingControl (self,x,y):
         return x < 1900 and y < 1080 and x > 0 and  y > 0
@@ -183,8 +213,8 @@ class BresenhamCanvas(Canvas):
                 else:
                     x = x+1 if x < x1 else x-1
                 p += incNE
-
             self.draw_point(x, y, color=color)
+
     def draw_line(self, x0, y0, x1, y1, color="red"):
         dx = (x1-x0)
         dy = (y1-y0)
@@ -254,7 +284,49 @@ class BresenhamCanvas(Canvas):
             self.draw_point(xc-y, yc+x, color)
             self.draw_point(xc+y, yc-x, color)
             self.draw_point(xc-y, yc-x, color)
-    
+
+    def borde(self,x,y,grosor):
+        for i in range(-grosor,grosor+1):
+            for l in range(-grosor,grosor+1):
+                self.draw_point(x+i,y+l,color="red")
+
+    def draw_circunf_grosor(self,xc, yc, radio, color):
+        setpoints_lineaCG()
+        x = 0
+        y = radio
+        p = 1 - radio
+        self.draw_point(xc+x, yc+y, color)
+        self.draw_point(xc-x, yc+y, color)
+        self.draw_point(xc+x, yc-y, color)
+        self.draw_point(xc-x, yc-y, color)
+        self.draw_point(xc+y, yc+x, color)
+        self.draw_point(xc-y, yc+x, color)
+        self.draw_point(xc+y, yc-x, color)
+        self.draw_point(xc-y, yc-x, color)
+        while (x < y):
+            x += 1
+            if p < 0:
+                p = p + 2*x +1
+            else:
+                y -= 1
+                p = p + 2*(x-y) + 1
+            self.borde(xc+x, yc+y,groso)
+            self.draw_point(xc+x, yc+y, color)
+            self.borde(xc-x, yc+y,groso)
+            self.draw_point(xc-x, yc+y, color)
+            self.borde(xc+x, yc-y,groso)
+            self.draw_point(xc+x, yc-y, color)
+            self.borde(xc-x, yc-y,groso)
+            self.draw_point(xc-x, yc-y, color)
+            self.borde(xc+y, yc+x,groso)
+            self.draw_point(xc+y, yc+x, color)
+            self.borde(xc-y, yc+x,groso)
+            self.draw_point(xc-y, yc+x, color)
+            self.borde(xc+y, yc-x,groso)
+            self.draw_point(xc+y, yc-x, color)
+            self.borde(xc-y, yc-x,groso)
+            self.draw_point(xc-y, yc-x, color)
+
     def traslacion(self, x, y, tx, ty):
         matriz_traslacion = np.array([[1,0,tx],[0,1,ty],[0,0,1]])
         coordenadas = np.array([x,y,1])
@@ -292,7 +364,6 @@ class BresenhamCanvas(Canvas):
         
 thereIsCircle = False
 thereIsRectangle = False
-thereIsSquare = False
 thereIsTriangle = False
 
 class Circle:
@@ -339,6 +410,10 @@ class Circle:
         matrizCal = canvas.escalacion2(pivx,pivy,coorx,coory)
         arrayAux = canvas.escalacion3(self.xcenterP,self.ycenterP,matrizCal)
         self.draw_circle(arrayAux[0], arrayAux[1], (self.radiousP*coorx))
+    
+    def draw_grosor(self):
+        global xcenterP, ycenterP, radiousP
+        canvas.draw_circunf_grosor(self.xcenterP,self.ycenterP,self.radiousP,color="red")
 
 class Rectangle:
     
@@ -413,6 +488,14 @@ class Rectangle:
         array3 = canvas.escalacion3(self.x1P,self.y1P,matrizCalc)
         self.draw_rectangle(array2[0], array2[1], array3[0], array3[1])
 
+    def draw_grosor(self):
+        global x0P,y0P,x1P,y1P
+        canvas.drawLineaConGrosorFiguras(self.x0P,self.y0P,self.x1P,self.y0P)
+        canvas.drawLineaConGrosorFiguras(self.x0P,self.y1P,self.x1P,self.y1P)
+        canvas.drawLineaConGrosorFiguras(self.x1P,self.y0P,self.x1P,self.y1P)
+        canvas.drawLineaConGrosorFiguras(self.x0P,self.y0P,self.x0P,self.y1P)
+
+
 class Triangle:
 
     def __init__(self):
@@ -471,13 +554,19 @@ class Triangle:
         array1 = canvas.escalacion3(self.x1p,self.y1p,matrizCal)
         array2 = canvas.escalacion3(self.x2p,self.y2p,matrizCal)
         self.draw_triangle(array0[0], array0[1], array1[0], array1[1], array2[0], array2[1])
+    
+    def draw_grosor(self):
+        global x0p,y0p,x1p,y1p,x2p,y2p
+        canvas.drawLineaConGrosorFiguras(self.x0p, self.y0p, self.x1p, self.y1p)
+        canvas.drawLineaConGrosorFiguras(self.x1p, self.y1p, self.x2p, self.y2p)
+        canvas.drawLineaConGrosorFiguras(self.x0p, self.y0p, self.x2p, self.y2p)
 
 circle1 = Circle()
 rectangle1 = Rectangle()
 triangle1 = Triangle()
 
 def traslation():
-    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    global thereIsCircle, thereIsTriangle,thereIsRectangle
     global circle1,rectangle1
     canvas.delete('all')
     if thereIsCircle:
@@ -488,7 +577,7 @@ def traslation():
         triangle1.traslation_triangle()
 
 def rotation():
-    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    global thereIsCircle, thereIsTriangle,thereIsRectangle
     global circle1,rectangle1
     canvas.delete('all')
     coordinates_rotation()
@@ -501,7 +590,7 @@ def rotation():
         triangle1.rotation_triangle()
 
 def escalation():
-    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    global thereIsCircle, thereIsTriangle,thereIsRectangle
     global circle1,rectangle1
     canvas.delete('all')
     coordinates_escalation()
@@ -515,7 +604,7 @@ def escalation():
         triangle1.escalation_triangle()
         
 def drawCircle1():
-    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    global thereIsCircle, thereIsTriangle,thereIsRectangle
     global circle1
     thereIsCircle = True
     canvas.delete('all')
@@ -525,7 +614,7 @@ def drawCircle1():
     circle1.drawCircle()
 
 def drawRectangle1():
-    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    global thereIsCircle, thereIsTriangle,thereIsRectangle
     thereIsRectangle = True
     canvas.delete('all')
     thereIsCircle = False
@@ -534,7 +623,7 @@ def drawRectangle1():
     rectangle1.drawRectangle()
 
 def drawTriangle1():
-    global thereIsCircle, thereIsSquare,thereIsTriangle,thereIsRectangle
+    global thereIsCircle, thereIsTriangle,thereIsRectangle
     thereIsTriangle = True
     canvas.delete('all')
     thereIsCircle = False
@@ -544,13 +633,14 @@ def drawTriangle1():
     
 def drawLineaconGrosor1():
     canvas.delete('all')
-    #clear_canvas()
-    thereIsCircle = False
-    thereIsRectangle = False
-    thereIsSquare = False
-    thereIsTriangle = False
+    global thereIsCircle, thereIsTriangle,thereIsRectangle
     inLinea()
-    canvas.drawLineaConGrosor()
+    if thereIsRectangle:
+        rectangle1.draw_grosor()
+    if thereIsTriangle:
+        triangle1.draw_grosor()
+    if thereIsCircle:
+        circle1.draw_grosor()
     #clear_canvas()
 
 def limpiar():
@@ -669,6 +759,10 @@ def create_buttons():
     button_linea_grosor = Button(window, text="Clean", 
                             font=("Comic Sans", 15), width=10, command=limpiar)
     button_linea_grosor.place(x=1540, y=750)
+    #boton de rellenar
+    button_linea_grosor = Button(window, text="Rellenar", 
+                            font=("Comic Sans", 15), width=10, command=floodfill1)
+    button_linea_grosor.place(x=1540, y=800)
      #
     button_traslacion = Button(window, text="Trasladar", font=(
         "Comic Sans", 15), width=10, command=traslation)
