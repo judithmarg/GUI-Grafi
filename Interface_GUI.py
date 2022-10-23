@@ -1,11 +1,15 @@
+
 from tkinter import *
 from tkinter import filedialog
-from turtle import xcor
+from tkinter import colorchooser
+from turtle import right, xcor
 from PIL import ImageGrab
-from cv2 import circle
+from cv2 import circle, line
 import numpy as np
 import math
 import sys
+import customtkinter
+
 
 sys.setrecursionlimit(2000000000)
 rows = 1500
@@ -18,7 +22,6 @@ def init():
     for i in range(0, rows):
         for l in range(0, cols):
             mat[i][l] = 'none'
-
 
             #print(i,"  ",l," = ",mat[i][l])
 dondex = -1
@@ -46,7 +49,7 @@ class BresenhamCanvas(Canvas):
         global mat
         mat[x][y] = color
         if self.clippingControl(x, y):
-            self.create_line(x, y, x+1, y+1, fill=color, width=2)
+            self.create_line(x, y, x+1, y+1, fill=colorHex, width=2)
 
     def FloodFill(self):
         #self.linea(100, 100, 60, 500, 1)
@@ -96,9 +99,9 @@ class BresenhamCanvas(Canvas):
                 ayuda += 1
                 if punteada == True:
                     if int(ayuda/10) % 2 == 1:
-                        self.draw_point(x, y, color=color)
+                        self.draw_point(x, y, color=colorHex)
                 else:
-                    self.draw_point(x, y, color=color)
+                    self.draw_point(x, y, color=colorHex)
                 x = x+1 if x < x1 else x-1
                 if p < 0:
                     p += incE
@@ -130,7 +133,7 @@ class BresenhamCanvas(Canvas):
                     if dondey == -1:
                         dondey = y
                 ayuda += 1
-                self.draw_point(x, y, color=color)
+                self.draw_point(x, y, color=colorHex)
                 y = y+1 if y < y1 else y-1
                 if p < 0:
                     p += incE
@@ -138,7 +141,7 @@ class BresenhamCanvas(Canvas):
                     x = x+1 if x < x1 else x-1
                     p += incNE
 
-    def linea(self, x1, y1, x2, y2, ancho, color="red"):
+    def linea(self, x1, y1, x2, y2, ancho, color):
 
         BresenhamCanvas.bresenham(self, x1, y1, x2, y2, color)
         if ancho == 0:
@@ -203,7 +206,7 @@ class BresenhamCanvas(Canvas):
     def clippingControl(self, x, y):
         return x < 1900 and y < 1080 and x > 0 and y > 0
 
-    def draw_line1(self, x0, y0, x1, y1, color="red"):
+    def draw_line1(self, x0, y0, x1, y1):
         dx = abs(x1-x0)
         dy = abs(y1-y0)
         p = 2*dy-dx if dx > dy else 2*dx-dy
@@ -222,7 +225,7 @@ class BresenhamCanvas(Canvas):
             start = y
             end = yend
 
-        self.draw_point(x, y, color=color)
+        self.draw_point(x, y, color=colorHex)
         for i in range(start, end):
             if dx > dy:
                 x = x+1 if x < x1 else x-1
@@ -236,9 +239,9 @@ class BresenhamCanvas(Canvas):
                 else:
                     x = x+1 if x < x1 else x-1
                 p += incNE
-            self.draw_point(x, y, color=color)
+            self.draw_point(x, y, color=colorHex)
 
-    def draw_line(self, x0, y0, x1, y1, color="red"):
+    def draw_line(self, x0, y0, x1, y1, color):
         dx = (x1-x0)
         dy = (y1-y0)
         if dy < 0:
@@ -253,7 +256,7 @@ class BresenhamCanvas(Canvas):
             stepx = 1
         x = x0
         y = y0
-        self.draw_point(x, y, color=color)
+        self.draw_point(x, y, color=colorHex)
         if (dx > dy):
             p = 2 * dy-dx
             incE = 2 * dy
@@ -265,7 +268,7 @@ class BresenhamCanvas(Canvas):
                 else:
                     y = y + stepy
                     p = p + incNE
-                self.draw_point(x, y, color=color)
+                self.draw_point(x, y, color=colorHex)
         else:
             p = 2 * dx - dy
             incE = 2 * dx
@@ -277,7 +280,7 @@ class BresenhamCanvas(Canvas):
                 else:
                     x = x + stepx
                     p = p + incNE
-                self.draw_point(x, y, color=color)
+                self.draw_point(x, y, color=colorHex)
 
     def draw_circunf(self, xc, yc, radio, color):
         x = 0
@@ -311,7 +314,7 @@ class BresenhamCanvas(Canvas):
     def borde(self, x, y, grosor):
         for i in range(-grosor, grosor+1):
             for l in range(-grosor, grosor+1):
-                self.draw_point(x+i, y+l, color="red")
+                self.draw_point(x+i, y+l, color=colorHex)
 
     def draw_circunf_grosor(self, xc, yc, radio, color):
         setpoints_lineaCG()
@@ -405,7 +408,7 @@ class Circle:
         self.radiousP = radious
 
     def draw_circle(self, xcenter, ycenter, radious):
-        canvas.draw_circunf(xcenter, ycenter, radious, color="red")
+        canvas.draw_circunf(xcenter, ycenter, radious, color=colorHex)
         self.modify(xcenter, ycenter, radious)
 
     def drawCircle(self):
@@ -469,17 +472,17 @@ class Rectangle:
         self.y3P = y3
 
     def draw_rectangle(self, x0, y0, x1, y1):
-        canvas.draw_line(x0, y0, x1, y0, color="blue")
-        canvas.draw_line(x0, y1, x1, y1, color="blue")
-        canvas.draw_line(x1, y0, x1, y1, color="blue")
-        canvas.draw_line(x0, y0, x0, y1, color="blue")
+        canvas.draw_line(x0, y0, x1, y0, color=colorHex)
+        canvas.draw_line(x0, y1, x1, y1, color=colorHex)
+        canvas.draw_line(x1, y0, x1, y1, color=colorHex)
+        canvas.draw_line(x0, y0, x0, y1, color=colorHex)
         self.modify(x0, y0, x1, y1)
 
     def draw_rectangle2(self, x0, y0, x1, y1, x2, y2, x3, y3):
-        canvas.draw_line(x0, y0, x2, y2, color="blue")
-        canvas.draw_line(x0, y0, x3, y3, color="blue")
-        canvas.draw_line(x3, y3, x1, y1, color="blue")
-        canvas.draw_line(x2, y2, x1, y1, color="blue")
+        canvas.draw_line(x0, y0, x2, y2, color=colorHex)
+        canvas.draw_line(x0, y0, x3, y3, color=colorHex)
+        canvas.draw_line(x3, y3, x1, y1, color=colorHex)
+        canvas.draw_line(x2, y2, x1, y1, color=colorHex)
         self.modify2(x0, y0, x1, y1, x2, y2, x3, y3)
 
     def drawRectangle(self):
@@ -548,9 +551,9 @@ class Triangle:
         self.y2p = y2
 
     def draw_triangle(self, x0, y0, x1, y1, x2, y2):
-        canvas.draw_line(x0, y0, x1, y1, color="blue")
-        canvas.draw_line(x1, y1, x2, y2, color="blue")
-        canvas.draw_line(x2, y2, x0, y0, color="blue")
+        canvas.draw_line(x0, y0, x1, y1, color=colorHex)
+        canvas.draw_line(x1, y1, x2, y2, color=colorHex)
+        canvas.draw_line(x2, y2, x0, y0, color=colorHex)
         self.modify(x0, y0, x1, y1, x2, y2)
 
     def drawTriangle(self):
@@ -651,7 +654,7 @@ def drawCircle1():
     global thereIsCircle, thereIsTriangle, thereIsRectangle
     global circle1
     thereIsCircle = True
-    canvas.delete('all')
+    # canvas.delete('all')
     thereIsRectangle = False
     thereIsSquare = False
     thereIsTriangle = False
@@ -661,7 +664,7 @@ def drawCircle1():
 def drawRectangle1():
     global thereIsCircle, thereIsTriangle, thereIsRectangle
     thereIsRectangle = True
-    canvas.delete('all')
+    # canvas.delete('all')
     thereIsCircle = False
     thereIsSquare = False
     thereIsTriangle = False
@@ -671,7 +674,7 @@ def drawRectangle1():
 def drawTriangle1():
     global thereIsCircle, thereIsTriangle, thereIsRectangle
     thereIsTriangle = True
-    canvas.delete('all')
+    # canvas.delete('all')
     thereIsCircle = False
     thereIsRectangle = False
     thereIsSquare = False
@@ -692,7 +695,7 @@ def drawLineaconGrosor1():
 
 
 def limpiar():
-    clear_canvas()
+    # clear_canvas()
     init()
     global donde, dondey, punteada
     punteada = False
@@ -705,7 +708,8 @@ def limpiar():
 def press_button_mouse(event):
     puntosx.append(event.x)
     puntosy.append(event.y)
-    canvas.create_oval(event.x-5, event.y-5, event.x+5, event.y+5, fill="red")
+    canvas.create_oval(event.x-2, event.y-2, event.x +
+                       2, event.y+2, fill=colorHex)
 
 
 def setpoints_circ():
@@ -751,7 +755,7 @@ def savefile():
     file = filedialog.asksaveasfilename(initialdir="C:/",
                                         filetypes=(('PNG File', '.PNG'), ('PNG File', '.PNG')))
     file = file + ".PNG"
-    ImageGrab.grab().crop((150, 150, 1500, 1000)).save(file)
+    ImageGrab.grab().crop((70, 70, 1500, 1000)).save(file)
 
 
 def clear_canvas():
@@ -764,19 +768,53 @@ def clear_canvas():
     puntosy.clear()
 
 
+def set_opcion_limpiar(choice):
+    if choice == "Limpiar Canvas":
+        clear_canvas()
+    if choice == "Limpiar Puntos":
+        limpiar()
+
+
+def set_opcionfigura(choice):
+    if choice == "Cuadrado":
+        drawRectangle1()
+    if choice == "Triangulo":
+        drawTriangle1()
+    if choice == "Circulo":
+        drawCircle1()
+
+
+def set_grosor(choice):
+    global grosor
+    if choice == "Grosor 1":
+        grosor = int("1")
+        drawLineaconGrosor1()
+    if choice == "Grosor 2":
+        print(groso)
+
+
 def create_menu():
     init()
-    menu_bar = Menu(window)
-    window.config(menu=menu_bar)
-    options1 = Menu(menu_bar, tearoff=0)
-    options1.add_command(label="Clear", command=clear_canvas)
-    options1.add_command(label="Save", command=savefile)
-    menu_bar.add_cascade(label="Options", menu=options1)
+    opciones_figura = customtkinter.StringVar(value="Figuras")
+    combobox_figura = customtkinter.CTkOptionMenu(master=window, values=["Cuadrado", "Triangulo", "Circulo"],
+                                                  command=set_opcionfigura,
+                                                  variable=opciones_figura)
+    combobox_figura.place(x=10, y=10)
+
+    opciones_limpiar = customtkinter.StringVar(value="Limpiar")
+    combobox_limpiar = customtkinter.CTkOptionMenu(master=window, values=[
+                                                   "Limpiar Canvas", "Limpiar Puntos"], command=set_opcion_limpiar, variable=opciones_limpiar)
+    combobox_limpiar.place(x=350, y=10)
+
+    option_grosor = customtkinter.StringVar(value="Grosor")
+    combobox_grosor = customtkinter.CTkOptionMenu(
+        master=window, values=["Grosor 1", "Grosor 2"], command=set_grosor, variable=option_grosor)
+    combobox_grosor.place(x=180, y=10)
 
 
 def inLinea():
     global groso
-    groso = int(entryGrosor.get())
+    groso = grosor
 
 
 def coordinates_traslation():
@@ -787,7 +825,7 @@ def coordinates_traslation():
 
 def coordinates_rotation():
     global angulo
-    angulo = int(entryAngulo.get())
+    angulo = valorRotacion
 
 
 def coordinates_escalation():
@@ -802,109 +840,88 @@ def cambiarPunteada():
     drawLineaconGrosor1()
 
 
+def colors():
+    global colorHex
+    color = colorchooser.askcolor()
+    colorHex = color[1]
+    print(colorHex)
+
+
+def open_dialog():
+    global valorRotacion
+    dialog = customtkinter.CTkInputDialog(
+        master=None, text="Angulo:", title="Ingrese un angulo")
+    valorRotacion = int(dialog.get_input())
+    rotation()
+
+
 def create_buttons():
-    buton_square = Button(window, text="Square",
-                          font=("Comic Sans", 15), width=10, command=drawRectangle1)
-    buton_square.place(x=1540, y=150)
-
-    buton_triangle = Button(window, text="Triangle",
-                            font=("Comic Sans", 15), width=10, command=drawTriangle1)
-    buton_triangle.place(x=1540, y=200)
-
-    buton_circle = Button(window, text="Circle",
-                          font=("Comic Sans", 15), width=10, command=drawCircle1)
-    buton_circle.place(x=1540, y=250)
-    #
-    button_linea_grosor = Button(window, text="Linea",
-                                 font=("Comic Sans", 15), width=10, command=drawLineaconGrosor1)
-    button_linea_grosor.place(x=1540, y=650)
-    label1 = Label(window, text="grosor:", fg="white",
-                   bg="#1c1c1c", font=("Verdana", 10)).place(x=1530, y=700)
-    global entryGrosor
-    entryGrosor = Entry(window, font=("Arial", 15), width=5)
-    entryGrosor.pack()
-    entryGrosor.place(x=1600, y=700)
-    # boton de linea punteada
-    button_linea_grosor1 = Button(window, text="Punteada",
-                                  font=("Comic Sans", 15), width=10, command=cambiarPunteada)
-    button_linea_grosor1.place(x=1540, y=850)
-    # boton de limpiar
-    button_linea_grosor2 = Button(window, text="Clean",
-                                  font=("Comic Sans", 15), width=10, command=limpiar)
-    button_linea_grosor2.place(x=1540, y=750)
-    # boton de rellenar
-    button_linea_grosor = Button(window, text="Rellenar",
-                                 font=("Comic Sans", 15), width=10, command=floodfill1)
-    button_linea_grosor.place(x=1540, y=800)
-    #
-    button_traslacion = Button(window, text="Trasladar", font=(
-        "Comic Sans", 15), width=10, command=traslation)
-    button_traslacion.place(x=1540, y=300)
-    label1 = Label(window, text="x:", fg="white", bg="#1c1c1c",
-                   font=("Verdana", 10)).place(x=1570, y=350)
-    global entryX, entryY
-    entryX = Entry(window, font=("Arial", 15), width=5)
+    global entryX, entryY, entryX1, entryY1
+    button_color = customtkinter.CTkButton(
+        master=window, text="Color", command=colors)
+    button_color.place(x=520, y=10)
+    button_rotar = customtkinter.CTkButton(
+        master=window, text="Rotar", command=open_dialog)
+    button_rotar.place(x=690, y=10)
+    button_trasladar = customtkinter.CTkButton(
+        master=window, text="Trasladar", command=traslation)
+    button_trasladar.place(x=1320, y=40)
+    label1 = customtkinter.CTkLabel(
+        master=window, text="X:").place(x=1240, y=90)
+    entryX = customtkinter.CTkEntry(
+        master=window, placeholder_text="Punto x")
     entryX.pack()
-    entryX.place(x=1590, y=350)
-    label2 = Label(window, text="y:", fg="white", bg="#1c1c1c",
-                   font=("Verdana", 10)).place(x=1670, y=350)
-    entryY = Entry(window, font=("Arial", 15), width=5)
+    entryX.place(x=1320, y=90)
+    label2 = customtkinter.CTkLabel(
+        master=window, text="Y:").place(x=1240, y=130)
+    entryY = customtkinter.CTkEntry(
+        master=window, placeholder_text="Punto y")
     entryY.pack()
-    entryY.place(x=1690, y=350)
+    entryY.place(x=1320, y=130)
 
-    button_rotar = Button(window, text="Rotar", font=(
-        "Comic Sans", 15), width=10, command=rotation)
-    button_rotar.place(x=1540, y=400)
-    label3 = Label(window, text="Angulo:", fg="white",
-                   bg="#1c1c1c", font=("Verdana", 10)).place(x=1530, y=450)
-    global entryAngulo
-    entryAngulo = Entry(window, font=("Arial", 15), width=5)
-    entryAngulo.pack()
-    entryAngulo.place(x=1590, y=450)
-
-    button_escalar = Button(window, text="Escalar", font=(
-        "Comic Sans", 15), width=10, command=escalation)
-    button_escalar.place(x=1540, y=500)
-    label4 = Label(window, text="x:", fg="white", bg="#1c1c1c",
-                   font=("Verdana", 10)).place(x=1570, y=550)
-    global entryX1, entryY1
-    entryX1 = Entry(window, font=("Arial", 15), width=5)
+    button_escalar = customtkinter.CTkButton(
+        master=window, text="Escalar", command=escalation).place(x=1320, y=180)
+    label3 = customtkinter.CTkLabel(
+        master=window, text="X:").place(x=1240, y=220)
+    entryX1 = customtkinter.CTkEntry(
+        master=window, placeholder_text="Punto x")
     entryX1.pack()
-    entryX1.place(x=1590, y=550)
-    label5 = Label(window, text="y:", fg="white", bg="#1c1c1c",
-                   font=("Verdana", 10)).place(x=1670, y=550)
-    entryY1 = Entry(window, font=("Arial", 15), width=5)
+    entryX1.place(x=1320, y=220)
+    label4 = customtkinter.CTkLabel(
+        master=window, text="Y:").place(x=1240, y=260)
+    entryY1 = customtkinter.CTkEntry(
+        master=window, placeholder_text="Punto y")
     entryY1.pack()
-    entryY1.place(x=1690, y=550)
+    entryY1.place(x=1320, y=260)
 
-    button_close = Button(window, text="Close",
-                          font=("Comic Sans", 15), width=10, command=window.destroy)
-    button_close.place(x=1540, y=600)
+    button_pintar = customtkinter.CTkButton(
+        master=window, text="Pintar").place(x=1320, y=310)
+    button_save = customtkinter.CTkButton(
+        master=window, text="Guardar Imagen", command=savefile).place(x=1320, y=380)
+
+    button_close = customtkinter.CTkButton(
+        master=window, text="Cerrar App", command=window.destroy).place(x=1320, y=700)
 
 
 def create_canvas():
     global canvas
-    canvas = BresenhamCanvas(frame, width=1500, height=1700)
-    # canvas.bind("<Motion>", mouse_move)
+    canvas = BresenhamCanvas(window, width=1540, height=950)
     canvas.bind("<Button-1>", press_button_mouse)
-    canvas.pack(side=LEFT)
+    canvas.place(x=0, y=70)
 
 
 def main():
-    global window, frame, puntosx, puntosy, circle
+    global window, puntosx, puntosy, circle, colorHex
+    customtkinter.set_appearance_mode("dark")
+    customtkinter.set_default_color_theme("dark-blue")
     puntosx = []
     puntosy = []
-    window = Tk()
-    window.geometry("1900x1000")
+    window = customtkinter.CTk()
+    window.geometry("1540x800+0+0")
     window.title("GUI grafi")
     window.resizable(0, 0)
-    window.config(background="#1c1c1c")
     create_menu()
-    label = Label(window, text="  Choose your \n figure to draw", fg="white", bg="#1c1c1c", font=("Verdana", 15)).place(
-        x=1515, y=60)
     create_buttons()
-    frame = Frame(window, width=1500, height=1000, bg="white")
-    frame.pack(side=LEFT)
     create_canvas()
 
     window.mainloop()
