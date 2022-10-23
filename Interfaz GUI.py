@@ -22,6 +22,7 @@ def init():
         for l in range(0, cols):
             mat[i][l] = 'none'
 
+
             #print(i,"  ",l," = ",mat[i][l])
 dondex = -1
 dondey = -1
@@ -393,9 +394,10 @@ thereIsCircle = False
 thereIsRectangle = False
 thereIsTriangle = False
 
+
 class Figura:
 
-    def draw(self,objeto):
+    def draw(self, objeto):
         if objeto.__class__.__name__ is Circle:
             objeto.drawCircle()
         if objeto.__class__.__name__ is Rectangle:
@@ -427,7 +429,8 @@ class Circle(Figura):
 
     def draw_circle_automat(self):
         global xcenterP, ycenterP, radiousP
-        canvas.draw_circunf(self.xcenterP,self.ycenterP,self.radiousP,color=colorHex)
+        canvas.draw_circunf(self.xcenterP, self.ycenterP,
+                            self.radiousP, color=colorHex)
 
     def traslation_circle(self):
         global xcenterP, ycenterP, radiousP
@@ -456,7 +459,7 @@ class Circle(Figura):
     def draw_grosor(self):
         global xcenterP, ycenterP, radiousP
         canvas.draw_circunf_grosor(
-            self.xcenterP, self.ycenterP, self.radiousP, color="red")
+            self.xcenterP, self.ycenterP, self.radiousP, color=colorHex)
 
 
 class Rectangle(Figura):
@@ -504,9 +507,8 @@ class Rectangle(Figura):
         self.modify(x0, y0, x1, y1)
 
     def draw_rectangle_automat(self):
-        global x0P,y0P,x1P,y1P
+        global x0P, y0P, x1P, y1P
         self.draw_rectangle(self.x0P, self.y0P, self.x1P, self.y1P)
-
 
     def traslation_rectangle(self):
         global x0P, y0P, x1P, y1P
@@ -580,8 +582,9 @@ class Triangle(Figura):
         self.modify(x0, y0, x1, y1, x2, y2)
 
     def draw_triangle_automat(self):
-        global x0p,y0p,x1p,y1p,x2p,y2p
-        self.draw_triangle(self.x0p,self.y0p,self.x1p,self.y1p,self.x2p,self.y2p)
+        global x0p, y0p, x1p, y1p, x2p, y2p
+        self.draw_triangle(self.x0p, self.y0p, self.x1p,
+                           self.y1p, self.x2p, self.y2p)
 
     def traslation_triangle(self):
         global x0p, y0p, x1p, y1p, x2p, y2p
@@ -633,8 +636,8 @@ figuras = []
 
 
 def traslation():
-    global thereIsCircle, thereIsTriangle,thereIsRectangle
-    global circle1,rectangle1
+    global thereIsCircle, thereIsTriangle, thereIsRectangle
+    global circle1, rectangle1
     canvas.delete('all')
     if thereIsCircle:
         figuras[len(figuras)-1].traslation_circle()
@@ -645,8 +648,8 @@ def traslation():
 
 
 def rotation():
-    global thereIsCircle, thereIsTriangle,thereIsRectangle
-    global circle1,rectangle1
+    global thereIsCircle, thereIsTriangle, thereIsRectangle
+    global circle1, rectangle1
     canvas.delete('all')
     coordinates_rotation()
     setpoints_punto_pivote()
@@ -659,8 +662,8 @@ def rotation():
 
 
 def escalation():
-    global thereIsCircle, thereIsTriangle,thereIsRectangle
-    global circle1,rectangle1
+    global thereIsCircle, thereIsTriangle, thereIsRectangle
+    global circle1, rectangle1
     canvas.delete('all')
     coordinates_escalation()
     setpoints_punto_pivote()
@@ -670,24 +673,24 @@ def escalation():
         figuras[len(figuras)-1].escalation_rectangle()
     if thereIsTriangle:
         figuras[len(figuras)-1].escalation_triangle()
-        
+
 
 def drawCircle1():
-    global thereIsCircle, thereIsTriangle,thereIsRectangle,figuras
+    global thereIsCircle, thereIsTriangle, thereIsRectangle, figuras
     global circle1
     thereIsCircle = True
-    #canvas.delete('all')
+    # canvas.delete('all')
     thereIsRectangle = False
-    thereIsTriangle = False 
+    thereIsTriangle = False
     circle1.drawCircle()
     figuras.append(Circle())
     dibujar(figuras[len(figuras)-1])
 
 
 def drawRectangle1():
-    global thereIsCircle, thereIsTriangle,thereIsRectangle
+    global thereIsCircle, thereIsTriangle, thereIsRectangle
     thereIsRectangle = True
-    #canvas.delete('all')
+    # canvas.delete('all')
     thereIsCircle = False
     thereIsTriangle = False
     rectangle1.drawRectangle()
@@ -696,9 +699,9 @@ def drawRectangle1():
 
 
 def drawTriangle1():
-    global thereIsCircle, thereIsTriangle,thereIsRectangle
+    global thereIsCircle, thereIsTriangle, thereIsRectangle
     thereIsTriangle = True
-    #canvas.delete('all')
+    # canvas.delete('all')
     thereIsCircle = False
     thereIsRectangle = False
     triangle1.drawTriangle()
@@ -718,11 +721,13 @@ def drawLineaconGrosor1():
         circle1.draw_grosor()
     # clear_canvas()
 
+
 def dibujar(figura):
     global figuras
     figuras.remove(figura)
     figuras.append(figura)
     redibujar()
+
 
 def redibujar():
     global figuras
@@ -747,9 +752,11 @@ def redibujar():
         except:
             print("No hay más figuras")
 
+
 def borrar():
     figuras.pop(len(figuras)-1)
     redibujar()
+
 
 def limpiar():
     # clear_canvas()
@@ -867,7 +874,11 @@ def set_grosor(choice):
         grosor = int("1")
         drawLineaconGrosor1()
     if choice == "Grosor 2":
-        print(groso)
+        grosor = int("2")
+        drawLineaconGrosor1()
+    if choice == "Grosor 3":
+        grosor = int("3")
+        drawLineaconGrosor1()
 
 
 def create_menu():
@@ -885,7 +896,7 @@ def create_menu():
 
     option_grosor = customtkinter.StringVar(value="Grosor")
     combobox_grosor = customtkinter.CTkOptionMenu(
-        master=window, values=["Grosor 1", "Grosor 2"], command=set_grosor, variable=option_grosor)
+        master=window, values=["Grosor 1", "Grosor 2", "Grosor 3"], command=set_grosor, variable=option_grosor)
     combobox_grosor.place(x=180, y=10)
 
 
