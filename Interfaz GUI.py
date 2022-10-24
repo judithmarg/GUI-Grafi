@@ -3,7 +3,7 @@ from tkinter import filedialog
 from tkinter import colorchooser
 from turtle import right, xcor
 from PIL import ImageGrab
-from cv2 import circle, line
+from cv2 import circle, line, rectangle
 import numpy as np
 import math
 import sys
@@ -396,6 +396,21 @@ class BresenhamCanvas(Canvas):
     def escalacion3(self, x, y, matriz):
         coordenadas = np.array([x, y, 1])
         return np.dot(matriz, coordenadas)
+    
+    def scan_line(self):    
+        global colorHex
+        for i in range(1,1500):
+            primero=-1
+            ultimo=-1
+            for l in range(1,1000):
+                if mat[i][l]!="none":
+                    ultimo=l
+                    if primero==-1:
+                        primero=l
+            if primero!=-1:
+                for l in range(primero,ultimo+1):
+                    if (mat[i][l]=="none"):
+                        self.draw_point(i, l, color=colorHex)
  
  
 thereIsCircle = False
@@ -633,62 +648,66 @@ class Triangle(Figura):
             self.x1p, self.y1p, self.x2p, self.y2p)
         canvas.drawLineaConGrosorFiguras(
             self.x0p, self.y0p, self.x2p, self.y2p)
- 
- 
+
 circle1 = Circle()
 rectangle1 = Rectangle()
-triangle1 = Triangle()
+triangle1  = Triangle()
 figuras = []
- 
+
+def rellenar1():
+    canvas.scan_line()
  
 def traslation():
     global thereIsCircle, thereIsTriangle,thereIsRectangle
-    global circle1,rectangle1
-    canvas.delete('all')
     if thereIsCircle:
+        actualizarLastFigura()
         figuras[len(figuras)-1].traslation_circle()
     if thereIsRectangle:
+        actualizarLastFigura()
         figuras[len(figuras)-1].traslation_rectangle()
     if thereIsTriangle:
+        actualizarLastFigura()
         figuras[len(figuras)-1].traslation_triangle()
  
  
 def rotation():
     global thereIsCircle, thereIsTriangle,thereIsRectangle
-    global circle1,rectangle1
-    canvas.delete('all')
     coordinates_rotation()
     setpoints_punto_pivote()
     if thereIsCircle:
+        actualizarLastFigura()
         figuras[len(figuras)-1].rotation_circle()
     if thereIsRectangle:
+        actualizarLastFigura()
         figuras[len(figuras)-1].rotation_rectangle()
     if thereIsTriangle:
+        actualizarLastFigura()
         figuras[len(figuras)-1].rotation_triangle()
- 
  
 def escalation():
     global thereIsCircle, thereIsTriangle,thereIsRectangle
-    global circle1,rectangle1
-    canvas.delete('all')
     coordinates_escalation()
     setpoints_punto_pivote()
     if thereIsCircle:
+        actualizarLastFigura()
         figuras[len(figuras)-1].escalation_circle()
     if thereIsRectangle:
+        actualizarLastFigura()
         figuras[len(figuras)-1].escalation_rectangle()
     if thereIsTriangle:
+        actualizarLastFigura()
         figuras[len(figuras)-1].escalation_triangle()
- 
+
+def actualizarLastFigura():
+    figuraADibujar = figuras[len(figuras)-1]
+    borrar()
+    figuras.append(figuraADibujar)
  
 def drawCircle1():
     global thereIsCircle, thereIsTriangle,thereIsRectangle,figuras
-    global circle1
     thereIsCircle = True
-    #canvas.delete('all')
     thereIsRectangle = False
     thereIsTriangle = False 
-    circle1.drawCircle()
     figuras.append(Circle())
     dibujar(figuras[len(figuras)-1])
  
@@ -696,10 +715,8 @@ def drawCircle1():
 def drawRectangle1():
     global thereIsCircle, thereIsTriangle,thereIsRectangle
     thereIsRectangle = True
-    #canvas.delete('all')
     thereIsCircle = False
     thereIsTriangle = False
-    rectangle1.drawRectangle()
     figuras.append(Rectangle())
     dibujar(figuras[len(figuras)-1])
  
@@ -707,10 +724,8 @@ def drawRectangle1():
 def drawTriangle1():
     global thereIsCircle, thereIsTriangle,thereIsRectangle
     thereIsTriangle = True
-    #canvas.delete('all')
     thereIsCircle = False
     thereIsRectangle = False
-    triangle1.drawTriangle()
     figuras.append(Triangle())
     dibujar(figuras[len(figuras)-1])
  
@@ -983,7 +998,7 @@ def create_buttons():
     entryY1.place(x=1320, y=260)
  
     button_pintar = customtkinter.CTkButton(
-        master=window, text="Pintar").place(x=1320, y=310)
+        master=window, text="Pintar", command=rellenar1).place(x=1320, y=310)
     button_save = customtkinter.CTkButton(
         master=window, text="Guardar Imagen", command=savefile).place(x=1320, y=380)
  
