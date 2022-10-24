@@ -191,7 +191,7 @@ class BresenhamCanvas(Canvas):
         self.linea(x, y, xe, ye, groso)
 
     def clippingControl(self, x, y):
-        return x < 1280 and y < 950 and x > 0 and y > 0
+        return x < 1540 and y < 950 and x > 0 and y > 0
 
     def draw_line(self, x0, y0, x1, y1, color):
         dx = (x1-x0)
@@ -874,12 +874,12 @@ def set_opcionfigura(choice):
 def set_grosor(choice):
     global grosor
     if choice == "Grosor 1":
-        grosor = 0
+        grosor = 1
         drawLineaconGrosor1()
     if choice == "Grosor 2":
-        grosor = 1
-    if choice == "Grosor 3":
         grosor = 2
+    if choice == "Grosor 3":
+        grosor = 3
 
 
 def create_menu():
@@ -961,52 +961,52 @@ def create_buttons():
     button_color.place(x=520, y=10)
     button_rellenar = customtkinter.CTkButton(
         master=window, text="Rellenar", command=rellenar1)
-    button_rellenar.place(x=850, y=10)
+    button_rellenar.place(x=860, y=10)
 
     button_Segmentada = customtkinter.CTkButton(
         master=window, text="Segmentada", command=segmentada1)
-    button_Segmentada.place(x=1000, y=10)
+    button_Segmentada.place(x=1030, y=10)
     button_Segmentada = customtkinter.CTkButton(
         master=window, text="Continua", command=continua1)
-    button_Segmentada.place(x=1150, y=10)
+    button_Segmentada.place(x=1200, y=10)
     button_rotar = customtkinter.CTkButton(
         master=window, text="Rotar", command=open_dialog)
     button_rotar.place(x=690, y=10)
     button_trasladar = customtkinter.CTkButton(
         master=window, text="Trasladar", command=traslation)
-    button_trasladar.place(x=1320, y=40)
+    button_trasladar.place(x=1320, y=100)
     label1 = customtkinter.CTkLabel(
-        master=window, text="X:").place(x=1240, y=90)
+        master=window, text="X:").place(x=1240, y=140)
     entryX = customtkinter.CTkEntry(
         master=window, placeholder_text="Punto x")
     entryX.pack()
-    entryX.place(x=1320, y=90)
+    entryX.place(x=1320, y=140)
     label2 = customtkinter.CTkLabel(
-        master=window, text="Y:").place(x=1240, y=130)
+        master=window, text="Y:").place(x=1240, y=180)
     entryY = customtkinter.CTkEntry(
         master=window, placeholder_text="Punto y")
     entryY.pack()
-    entryY.place(x=1320, y=130)
+    entryY.place(x=1320, y=180)
 
     button_escalar = customtkinter.CTkButton(
-        master=window, text="Escalar", command=escalation).place(x=1320, y=180)
+        master=window, text="Escalar", command=escalation).place(x=1320, y=220)
     label3 = customtkinter.CTkLabel(
-        master=window, text="X:").place(x=1240, y=220)
+        master=window, text="X:").place(x=1240, y=260)
     entryX1 = customtkinter.CTkEntry(
         master=window, placeholder_text="Punto x")
     entryX1.pack()
-    entryX1.place(x=1320, y=220)
+    entryX1.place(x=1320, y=260)
     label4 = customtkinter.CTkLabel(
-        master=window, text="Y:").place(x=1240, y=260)
+        master=window, text="Y:").place(x=1240, y=300)
     entryY1 = customtkinter.CTkEntry(
         master=window, placeholder_text="Punto y")
     entryY1.pack()
-    entryY1.place(x=1320, y=260)
+    entryY1.place(x=1320, y=300)
 
-    button_pintar = customtkinter.CTkButton(
-        master=window, text="Pintar", command=rellenar1).place(x=1320, y=310)
+    # button_pintar = customtkinter.CTkButton(
+    #     master=window, text="Pintar", command=rellenar1).place(x=1320, y=310)
     button_save = customtkinter.CTkButton(
-        master=window, text="Guardar Imagen", command=savefile).place(x=1320, y=380)
+        master=window, text="Guardar Imagen", command=savefile).place(x=1320, y=350)
 
     button_close = customtkinter.CTkButton(
         master=window, text="Cerrar App", command=window.destroy).place(x=1320, y=700)
@@ -1014,7 +1014,7 @@ def create_buttons():
 
 def create_canvas():
     global canvas
-    canvas = BresenhamCanvas(window, width=1280, height=950)
+    canvas = BresenhamCanvas(window, width=1540, height=950)
     canvas.bind("<Button-1>", press_button_mouse)
     canvas.place(x=0, y=70)
 
