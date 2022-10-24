@@ -23,7 +23,6 @@ def init():
         for l in range(0, cols):
             mat[i][l] = 'none'
  
-            #print(i,"  ",l," = ",mat[i][l])
 dondex = -1
 dondey = -1
 dx = [0, 0, 1, -1]
@@ -50,6 +49,7 @@ class BresenhamCanvas(Canvas):
         mat[x][y] = color
         if self.clippingControl(x, y):
             self.create_line(x, y, x+1, y+1, fill=colorHex, width=2)
+
     def FloodFill(self):
         #self.linea(100, 100, 60, 500, 1)
         #self.draw_point(500, 500, color="red")
@@ -147,9 +147,6 @@ class BresenhamCanvas(Canvas):
             return
         vx = x2-x1
         vy = y2-y1
-        # vector A,B extermos de la linea
- 
-        # perpendicular a AB
         wx = vy
         wy = -vx
         modulo = math.sqrt(wx*wx+wy*wy)
@@ -175,14 +172,9 @@ class BresenhamCanvas(Canvas):
             self, arribax, arribay, arribax2, arribay2, color)
         BresenhamCanvas.bresenham(
             self, abajox, abajoy, abajox2, abajoy2, color)
-        #print("donde  ",dondex," ",dondey)
         if ancho > 1:
             BresenhamCanvas.floodfill(self, dondex, dondey, color)
-        # dondex=-1
-        # dondey=-1
-        # bresenham(arribax,arribay,abajox,abajoy)
-        # floodfill(blank,abajox,abajoy,0)
- 
+     
     def floodfill(self, x, y, color="red"):
         global mat
         self.draw_point(x, y, color)
@@ -192,11 +184,6 @@ class BresenhamCanvas(Canvas):
             if (x1 > 0 and y1 > 0 and mat[x1][y1] == "none"):
                 BresenhamCanvas.floodfill(self, x1, y1, color)
  
-    def drawLineaConGrosor(self):
-        setpoints_lineaCG()
-        #self.linea(300, 300, 5, 200, 5)
-        self.linea(x0, y0, x1, y1, groso)
- 
     def drawLineaConGrosorFiguras(self, x, y, xe, ye):
         setpoints_lineaCG()
         #self.linea(300, 300, 5, 200, 5)
@@ -204,41 +191,6 @@ class BresenhamCanvas(Canvas):
  
     def clippingControl(self, x, y):
         return x < 1280 and y < 950 and x > 0 and y > 0
- 
-    def draw_line1(self, x0, y0, x1, y1):
-        dx = abs(x1-x0)
-        dy = abs(y1-y0)
-        p = 2*dy-dx if dx > dy else 2*dx-dy
-        incE = 2*dy if dx > dy else 2*dx
-        incNE = 2*(dy-dx) if dx > dy else 2*(dx-dy)
-        if (x0 > x1) and (y0 > y1):
-            x, y = x1, y1
-            xend, yend = x0, y0
-        else:
-            x, y = x0, y0
-            xend, yend = x1, y1
-        if dx > dy:
-            start = x
-            end = xend
-        else:
-            start = y
-            end = yend
- 
-        self.draw_point(x, y, color=colorHex)
-        for i in range(start, end):
-            if dx > dy:
-                x = x+1 if x < x1 else x-1
-            else:
-                y = y+1 if y < y1 else y-1
-            if p < 0:
-                p += incE
-            else:
-                if dx > dy:
-                    y = y+1 if y < y1 else y-1
-                else:
-                    x = x+1 if x < x1 else x-1
-                p += incNE
-            self.draw_point(x, y, color=colorHex)
  
     def draw_line(self, x0, y0, x1, y1, color):
         dx = (x1-x0)
@@ -256,10 +208,12 @@ class BresenhamCanvas(Canvas):
         x = x0
         y = y0
         global grosor
+        global punteada
         self.draw_point(x, y, color=colorHex)
         for i in range(-grosor,grosor+1):
             for l in range(-grosor,grosor+1):
                 self.draw_point(x+i, y+l, color=colorHex)
+        cantidad=0
         if (dx > dy):
             p = 2 * dy-dx
             incE = 2 * dy
@@ -271,10 +225,11 @@ class BresenhamCanvas(Canvas):
                 else:
                     y = y + stepy
                     p = p + incNE
-                self.draw_point(x, y, color=colorHex)
-                for i in range(-grosor,grosor+1):
-                    for l in range(-grosor,grosor+1):
-                        self.draw_point(x+i, y+l, color=colorHex)
+                if punteada==False or (punteada==True and (int(cantidad/6) % 2)==0):
+                    for i in range(-grosor,grosor+1):
+                        for l in range(-grosor,grosor+1):
+                            self.draw_point(x+i, y+l, color=colorHex)
+                cantidad+=1
         else:
             p = 2 * dx - dy
             incE = 2 * dx
@@ -286,11 +241,20 @@ class BresenhamCanvas(Canvas):
                 else:
                     x = x + stepx
                     p = p + incNE
-                self.draw_point(x, y, color=colorHex)
-                for i in range(-grosor,grosor+1):
-                    for l in range(-grosor,grosor+1):
-                        self.draw_point(x+i, y+l, color=colorHex)
-    def draw_circunf(self, xc, yc, radio, color):
+                if punteada==False or (punteada==True and (int(cantidad/6) % 2)==0):
+                    for i in range(-grosor,grosor+1):
+                        for l in range(-grosor,grosor+1):
+                            self.draw_point(x+i, y+l, color=colorHex)
+                cantidad+=1
+    def draw_circunf(self, xc,yc, radio, color):
+        global punteada,grosor
+        if grosor <= 1:
+            self.draw_circunf1(xc,yc,radio,color)
+        else:
+            self.draw_circunf_grosor(xc,yc,radio,color)
+
+    def draw_circunf1(self, xc, yc, radio, color):
+        global punteada
         x = 0
         y = radio
         p = 1 - radio
@@ -302,7 +266,8 @@ class BresenhamCanvas(Canvas):
         self.draw_point(xc-y, yc+x, color)
         self.draw_point(xc+y, yc-x, color)
         self.draw_point(xc-y, yc-x, color)
- 
+        
+        cantidad = 0
         while (x < y):
             x += 1
             if p < 0:
@@ -310,15 +275,17 @@ class BresenhamCanvas(Canvas):
             else:
                 y -= 1
                 p = p + 2*(x-y) + 1
-            self.draw_point(xc+x, yc+y, color)
-            self.draw_point(xc+x, yc-y, color)
-            self.draw_point(xc-x, yc+y, color)
-            self.draw_point(xc-x, yc-y, color)
-            self.draw_point(xc+y, yc+x, color)
-            self.draw_point(xc-y, yc+x, color)
-            self.draw_point(xc+y, yc-x, color)
-            self.draw_point(xc-y, yc-x, color)
- 
+            if punteada==False or (punteada==True and (int(cantidad/6) % 2)==0):
+                self.draw_point(xc+x, yc+y, color)
+                self.draw_point(xc+x, yc-y, color)
+                self.draw_point(xc-x, yc+y, color)
+                self.draw_point(xc-x, yc-y, color)
+                self.draw_point(xc+y, yc+x, color)
+                self.draw_point(xc-y, yc+x, color)
+                self.draw_point(xc+y, yc-x, color)
+                self.draw_point(xc-y, yc-x, color)
+            cantidad +=1
+    
     def borde(self, x, y, grosor):
         for i in range(-grosor, grosor+1):
             for l in range(-grosor, grosor+1):
@@ -326,6 +293,7 @@ class BresenhamCanvas(Canvas):
  
     def draw_circunf_grosor(self, xc, yc, radio, color):
         setpoints_lineaCG()
+        global punteada,grosor
         x = 0
         y = radio
         p = 1 - radio
@@ -337,6 +305,7 @@ class BresenhamCanvas(Canvas):
         self.draw_point(xc-y, yc+x, color)
         self.draw_point(xc+y, yc-x, color)
         self.draw_point(xc-y, yc-x, color)
+        cantidad = 0 
         while (x < y):
             x += 1
             if p < 0:
@@ -344,22 +313,24 @@ class BresenhamCanvas(Canvas):
             else:
                 y -= 1
                 p = p + 2*(x-y) + 1
-            self.borde(xc+x, yc+y, groso)
-            self.draw_point(xc+x, yc+y, color)
-            self.borde(xc-x, yc+y, groso)
-            self.draw_point(xc-x, yc+y, color)
-            self.borde(xc+x, yc-y, groso)
-            self.draw_point(xc+x, yc-y, color)
-            self.borde(xc-x, yc-y, groso)
-            self.draw_point(xc-x, yc-y, color)
-            self.borde(xc+y, yc+x, groso)
-            self.draw_point(xc+y, yc+x, color)
-            self.borde(xc-y, yc+x, groso)
-            self.draw_point(xc-y, yc+x, color)
-            self.borde(xc+y, yc-x, groso)
-            self.draw_point(xc+y, yc-x, color)
-            self.borde(xc-y, yc-x, groso)
-            self.draw_point(xc-y, yc-x, color)
+            if punteada==False or (punteada==True and (int(cantidad/6) % 2)==0):
+                self.borde(xc+x, yc+y, grosor)
+                self.draw_point(xc+x, yc+y, color)
+                self.borde(xc-x, yc+y, grosor)
+                self.draw_point(xc-x, yc+y, color)
+                self.borde(xc+x, yc-y, grosor)
+                self.draw_point(xc+x, yc-y, color)
+                self.borde(xc-x, yc-y, grosor)
+                self.draw_point(xc-x, yc-y, color)
+                self.borde(xc+y, yc+x, grosor)
+                self.draw_point(xc+y, yc+x, color)
+                self.borde(xc-y, yc+x, grosor)
+                self.draw_point(xc-y, yc+x, color)
+                self.borde(xc+y, yc-x, grosor)
+                self.draw_point(xc+y, yc-x, color)
+                self.borde(xc-y, yc-x, grosor)
+                self.draw_point(xc-y, yc-x, color)
+            cantidad += 1
  
     def traslacion(self, x, y, tx, ty):
         matriz_traslacion = np.array([[1, 0, tx], [0, 1, ty], [0, 0, 1]])
@@ -479,6 +450,7 @@ class Circle(Figura):
  
     def draw_grosor(self):
         global xcenterP, ycenterP, radiousP
+        global grosor
         canvas.draw_circunf_grosor(
             self.xcenterP, self.ycenterP, self.radiousP, color="red")
  
@@ -957,12 +929,29 @@ def open_dialog():
     valorRotacion = int(dialog.get_input())
     rotation()
  
- 
+def segmentada1():
+    global punteada
+    punteada=True
+
+def continua1():
+    global punteada
+    punteada=False
+
 def create_buttons():
     global entryX, entryY, entryX1, entryY1
     button_color = customtkinter.CTkButton(
         master=window, text="Color", command=colors)
     button_color.place(x=520, y=10)
+    button_rellenar = customtkinter.CTkButton(
+        master=window, text="Rellenar", command=rellenar1)
+    button_rellenar.place(x=850, y=10)
+ 
+    button_Segmentada = customtkinter.CTkButton(
+        master=window, text="Segmentada", command=segmentada1)
+    button_Segmentada.place(x=1000, y=10)
+    button_Segmentada = customtkinter.CTkButton(
+        master=window, text="Continua", command=continua1)
+    button_Segmentada.place(x=1150, y=10)
     button_rotar = customtkinter.CTkButton(
         master=window, text="Rotar", command=open_dialog)
     button_rotar.place(x=690, y=10)
